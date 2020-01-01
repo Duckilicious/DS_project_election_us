@@ -107,8 +107,5 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
 
     }
 
-    @Override
-    public void registerZkSessionStateListener(IZkStateListener iZkStateListener) {
-        zkClient.subscribeStateChanges(iZkStateListener);
-    }
+
 }

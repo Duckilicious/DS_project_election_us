@@ -20,5 +20,4 @@ public interface ZkServiceAPI {
 
     void registerChildrenChangeWatcher(String path, IZkChildListener iZkChildListener);
 
-    void registerZkSessionStateListener(IZkStateListener iZkStateListener);
 }
