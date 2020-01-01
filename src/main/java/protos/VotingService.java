@@ -37,6 +37,31 @@ public final class VotingService {
      */
     com.google.protobuf.ByteString
         getTimeBytes();
+
+    /**
+     * <code>bool leader_sent = 4;</code>
+     */
+    boolean getLeaderSent();
+
+    /**
+     * <code>string accepted_by = 5;</code>
+     */
+    java.lang.String getAcceptedBy();
+    /**
+     * <code>string accepted_by = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getAcceptedByBytes();
+
+    /**
+     * <code>bool vote_accepted = 6;</code>
+     */
+    boolean getVoteAccepted();
+
+    /**
+     * <code>bool leader_done = 7;</code>
+     */
+    boolean getLeaderDone();
   }
   /**
    * Protobuf type {@code protos.VoteRequest}
@@ -54,6 +79,10 @@ public final class VotingService {
       voterId_ = 0;
       voterCandidate_ = 0;
       time_ = "";
+      leaderSent_ = false;
+      acceptedBy_ = "";
+      voteAccepted_ = false;
+      leaderDone_ = false;
     }
 
     @java.lang.Override
@@ -101,6 +130,27 @@ public final class VotingService {
               java.lang.String s = input.readStringRequireUtf8();
 
               time_ = s;
+              break;
+            }
+            case 32: {
+
+              leaderSent_ = input.readBool();
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              acceptedBy_ = s;
+              break;
+            }
+            case 48: {
+
+              voteAccepted_ = input.readBool();
+              break;
+            }
+            case 56: {
+
+              leaderDone_ = input.readBool();
               break;
             }
           }
@@ -179,6 +229,67 @@ public final class VotingService {
       }
     }
 
+    public static final int LEADER_SENT_FIELD_NUMBER = 4;
+    private boolean leaderSent_;
+    /**
+     * <code>bool leader_sent = 4;</code>
+     */
+    public boolean getLeaderSent() {
+      return leaderSent_;
+    }
+
+    public static final int ACCEPTED_BY_FIELD_NUMBER = 5;
+    private volatile java.lang.Object acceptedBy_;
+    /**
+     * <code>string accepted_by = 5;</code>
+     */
+    public java.lang.String getAcceptedBy() {
+      java.lang.Object ref = acceptedBy_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        acceptedBy_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string accepted_by = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAcceptedByBytes() {
+      java.lang.Object ref = acceptedBy_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        acceptedBy_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int VOTE_ACCEPTED_FIELD_NUMBER = 6;
+    private boolean voteAccepted_;
+    /**
+     * <code>bool vote_accepted = 6;</code>
+     */
+    public boolean getVoteAccepted() {
+      return voteAccepted_;
+    }
+
+    public static final int LEADER_DONE_FIELD_NUMBER = 7;
+    private boolean leaderDone_;
+    /**
+     * <code>bool leader_done = 7;</code>
+     */
+    public boolean getLeaderDone() {
+      return leaderDone_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -200,6 +311,18 @@ public final class VotingService {
       if (!getTimeBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, time_);
       }
+      if (leaderSent_ != false) {
+        output.writeBool(4, leaderSent_);
+      }
+      if (!getAcceptedByBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, acceptedBy_);
+      }
+      if (voteAccepted_ != false) {
+        output.writeBool(6, voteAccepted_);
+      }
+      if (leaderDone_ != false) {
+        output.writeBool(7, leaderDone_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -218,6 +341,21 @@ public final class VotingService {
       }
       if (!getTimeBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, time_);
+      }
+      if (leaderSent_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, leaderSent_);
+      }
+      if (!getAcceptedByBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, acceptedBy_);
+      }
+      if (voteAccepted_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, voteAccepted_);
+      }
+      if (leaderDone_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(7, leaderDone_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -241,6 +379,14 @@ public final class VotingService {
           == other.getVoterCandidate());
       result = result && getTime()
           .equals(other.getTime());
+      result = result && (getLeaderSent()
+          == other.getLeaderSent());
+      result = result && getAcceptedBy()
+          .equals(other.getAcceptedBy());
+      result = result && (getVoteAccepted()
+          == other.getVoteAccepted());
+      result = result && (getLeaderDone()
+          == other.getLeaderDone());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -258,6 +404,17 @@ public final class VotingService {
       hash = (53 * hash) + getVoterCandidate();
       hash = (37 * hash) + TIME_FIELD_NUMBER;
       hash = (53 * hash) + getTime().hashCode();
+      hash = (37 * hash) + LEADER_SENT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getLeaderSent());
+      hash = (37 * hash) + ACCEPTED_BY_FIELD_NUMBER;
+      hash = (53 * hash) + getAcceptedBy().hashCode();
+      hash = (37 * hash) + VOTE_ACCEPTED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getVoteAccepted());
+      hash = (37 * hash) + LEADER_DONE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getLeaderDone());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -393,6 +550,14 @@ public final class VotingService {
 
         time_ = "";
 
+        leaderSent_ = false;
+
+        acceptedBy_ = "";
+
+        voteAccepted_ = false;
+
+        leaderDone_ = false;
+
         return this;
       }
 
@@ -418,6 +583,10 @@ public final class VotingService {
         result.voterId_ = voterId_;
         result.voterCandidate_ = voterCandidate_;
         result.time_ = time_;
+        result.leaderSent_ = leaderSent_;
+        result.acceptedBy_ = acceptedBy_;
+        result.voteAccepted_ = voteAccepted_;
+        result.leaderDone_ = leaderDone_;
         onBuilt();
         return result;
       }
@@ -468,6 +637,19 @@ public final class VotingService {
         if (!other.getTime().isEmpty()) {
           time_ = other.time_;
           onChanged();
+        }
+        if (other.getLeaderSent() != false) {
+          setLeaderSent(other.getLeaderSent());
+        }
+        if (!other.getAcceptedBy().isEmpty()) {
+          acceptedBy_ = other.acceptedBy_;
+          onChanged();
+        }
+        if (other.getVoteAccepted() != false) {
+          setVoteAccepted(other.getVoteAccepted());
+        }
+        if (other.getLeaderDone() != false) {
+          setLeaderDone(other.getLeaderDone());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -616,6 +798,153 @@ public final class VotingService {
         onChanged();
         return this;
       }
+
+      private boolean leaderSent_ ;
+      /**
+       * <code>bool leader_sent = 4;</code>
+       */
+      public boolean getLeaderSent() {
+        return leaderSent_;
+      }
+      /**
+       * <code>bool leader_sent = 4;</code>
+       */
+      public Builder setLeaderSent(boolean value) {
+        
+        leaderSent_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool leader_sent = 4;</code>
+       */
+      public Builder clearLeaderSent() {
+        
+        leaderSent_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object acceptedBy_ = "";
+      /**
+       * <code>string accepted_by = 5;</code>
+       */
+      public java.lang.String getAcceptedBy() {
+        java.lang.Object ref = acceptedBy_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          acceptedBy_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string accepted_by = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getAcceptedByBytes() {
+        java.lang.Object ref = acceptedBy_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          acceptedBy_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string accepted_by = 5;</code>
+       */
+      public Builder setAcceptedBy(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        acceptedBy_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string accepted_by = 5;</code>
+       */
+      public Builder clearAcceptedBy() {
+        
+        acceptedBy_ = getDefaultInstance().getAcceptedBy();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string accepted_by = 5;</code>
+       */
+      public Builder setAcceptedByBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        acceptedBy_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean voteAccepted_ ;
+      /**
+       * <code>bool vote_accepted = 6;</code>
+       */
+      public boolean getVoteAccepted() {
+        return voteAccepted_;
+      }
+      /**
+       * <code>bool vote_accepted = 6;</code>
+       */
+      public Builder setVoteAccepted(boolean value) {
+        
+        voteAccepted_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool vote_accepted = 6;</code>
+       */
+      public Builder clearVoteAccepted() {
+        
+        voteAccepted_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean leaderDone_ ;
+      /**
+       * <code>bool leader_done = 7;</code>
+       */
+      public boolean getLeaderDone() {
+        return leaderDone_;
+      }
+      /**
+       * <code>bool leader_done = 7;</code>
+       */
+      public Builder setLeaderDone(boolean value) {
+        
+        leaderDone_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool leader_done = 7;</code>
+       */
+      public Builder clearLeaderDone() {
+        
+        leaderDone_ = false;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -665,29 +994,52 @@ public final class VotingService {
 
   }
 
-  public interface VoteStatusOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:protos.VoteStatus)
+  public interface StartorStopRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:protos.StartorStopRequest)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>bool status = 1;</code>
+     * <code>string state = 1;</code>
      */
-    boolean getStatus();
+    java.lang.String getState();
+    /**
+     * <code>string state = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getStateBytes();
+
+    /**
+     * <code>int32 started_counter = 2;</code>
+     */
+    int getStartedCounter();
+
+    /**
+     * <code>bool first = 3;</code>
+     */
+    boolean getFirst();
+
+    /**
+     * <code>bool start_or_stop = 4;</code>
+     */
+    boolean getStartOrStop();
   }
   /**
-   * Protobuf type {@code protos.VoteStatus}
+   * Protobuf type {@code protos.StartorStopRequest}
    */
-  public  static final class VoteStatus extends
+  public  static final class StartorStopRequest extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:protos.VoteStatus)
-      VoteStatusOrBuilder {
+      // @@protoc_insertion_point(message_implements:protos.StartorStopRequest)
+      StartorStopRequestOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use VoteStatus.newBuilder() to construct.
-    private VoteStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use StartorStopRequest.newBuilder() to construct.
+    private StartorStopRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private VoteStatus() {
-      status_ = false;
+    private StartorStopRequest() {
+      state_ = "";
+      startedCounter_ = 0;
+      first_ = false;
+      startOrStop_ = false;
     }
 
     @java.lang.Override
@@ -695,7 +1047,7 @@ public final class VotingService {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private VoteStatus(
+    private StartorStopRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -721,9 +1073,25 @@ public final class VotingService {
               }
               break;
             }
-            case 8: {
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
 
-              status_ = input.readBool();
+              state_ = s;
+              break;
+            }
+            case 16: {
+
+              startedCounter_ = input.readInt32();
+              break;
+            }
+            case 24: {
+
+              first_ = input.readBool();
+              break;
+            }
+            case 32: {
+
+              startOrStop_ = input.readBool();
               break;
             }
           }
@@ -740,23 +1108,75 @@ public final class VotingService {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return protos.VotingService.internal_static_protos_VoteStatus_descriptor;
+      return protos.VotingService.internal_static_protos_StartorStopRequest_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return protos.VotingService.internal_static_protos_VoteStatus_fieldAccessorTable
+      return protos.VotingService.internal_static_protos_StartorStopRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              protos.VotingService.VoteStatus.class, protos.VotingService.VoteStatus.Builder.class);
+              protos.VotingService.StartorStopRequest.class, protos.VotingService.StartorStopRequest.Builder.class);
     }
 
-    public static final int STATUS_FIELD_NUMBER = 1;
-    private boolean status_;
+    public static final int STATE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object state_;
     /**
-     * <code>bool status = 1;</code>
+     * <code>string state = 1;</code>
      */
-    public boolean getStatus() {
-      return status_;
+    public java.lang.String getState() {
+      java.lang.Object ref = state_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        state_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string state = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getStateBytes() {
+      java.lang.Object ref = state_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        state_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int STARTED_COUNTER_FIELD_NUMBER = 2;
+    private int startedCounter_;
+    /**
+     * <code>int32 started_counter = 2;</code>
+     */
+    public int getStartedCounter() {
+      return startedCounter_;
+    }
+
+    public static final int FIRST_FIELD_NUMBER = 3;
+    private boolean first_;
+    /**
+     * <code>bool first = 3;</code>
+     */
+    public boolean getFirst() {
+      return first_;
+    }
+
+    public static final int START_OR_STOP_FIELD_NUMBER = 4;
+    private boolean startOrStop_;
+    /**
+     * <code>bool start_or_stop = 4;</code>
+     */
+    public boolean getStartOrStop() {
+      return startOrStop_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -771,8 +1191,17 @@ public final class VotingService {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (status_ != false) {
-        output.writeBool(1, status_);
+      if (!getStateBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, state_);
+      }
+      if (startedCounter_ != 0) {
+        output.writeInt32(2, startedCounter_);
+      }
+      if (first_ != false) {
+        output.writeBool(3, first_);
+      }
+      if (startOrStop_ != false) {
+        output.writeBool(4, startOrStop_);
       }
       unknownFields.writeTo(output);
     }
@@ -782,9 +1211,20 @@ public final class VotingService {
       if (size != -1) return size;
 
       size = 0;
-      if (status_ != false) {
+      if (!getStateBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, state_);
+      }
+      if (startedCounter_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(1, status_);
+          .computeInt32Size(2, startedCounter_);
+      }
+      if (first_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, first_);
+      }
+      if (startOrStop_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, startOrStop_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -796,14 +1236,20 @@ public final class VotingService {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof protos.VotingService.VoteStatus)) {
+      if (!(obj instanceof protos.VotingService.StartorStopRequest)) {
         return super.equals(obj);
       }
-      protos.VotingService.VoteStatus other = (protos.VotingService.VoteStatus) obj;
+      protos.VotingService.StartorStopRequest other = (protos.VotingService.StartorStopRequest) obj;
 
       boolean result = true;
-      result = result && (getStatus()
-          == other.getStatus());
+      result = result && getState()
+          .equals(other.getState());
+      result = result && (getStartedCounter()
+          == other.getStartedCounter());
+      result = result && (getFirst()
+          == other.getFirst());
+      result = result && (getStartOrStop()
+          == other.getStartOrStop());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -815,77 +1261,84 @@ public final class VotingService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + STATUS_FIELD_NUMBER;
+      hash = (37 * hash) + STATE_FIELD_NUMBER;
+      hash = (53 * hash) + getState().hashCode();
+      hash = (37 * hash) + STARTED_COUNTER_FIELD_NUMBER;
+      hash = (53 * hash) + getStartedCounter();
+      hash = (37 * hash) + FIRST_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getStatus());
+          getFirst());
+      hash = (37 * hash) + START_OR_STOP_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getStartOrStop());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static protos.VotingService.VoteStatus parseFrom(byte[] data)
+    public static protos.VotingService.StartorStopRequest parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static protos.VotingService.VoteStatus parseFrom(java.io.InputStream input)
+    public static protos.VotingService.StartorStopRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static protos.VotingService.VoteStatus parseDelimitedFrom(java.io.InputStream input)
+    public static protos.VotingService.StartorStopRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static protos.VotingService.VoteStatus parseDelimitedFrom(
+    public static protos.VotingService.StartorStopRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static protos.VotingService.VoteStatus parseFrom(
+    public static protos.VotingService.StartorStopRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -897,7 +1350,7 @@ public final class VotingService {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(protos.VotingService.VoteStatus prototype) {
+    public static Builder newBuilder(protos.VotingService.StartorStopRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
@@ -912,25 +1365,25 @@ public final class VotingService {
       return builder;
     }
     /**
-     * Protobuf type {@code protos.VoteStatus}
+     * Protobuf type {@code protos.StartorStopRequest}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:protos.VoteStatus)
-        protos.VotingService.VoteStatusOrBuilder {
+        // @@protoc_insertion_point(builder_implements:protos.StartorStopRequest)
+        protos.VotingService.StartorStopRequestOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return protos.VotingService.internal_static_protos_VoteStatus_descriptor;
+        return protos.VotingService.internal_static_protos_StartorStopRequest_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return protos.VotingService.internal_static_protos_VoteStatus_fieldAccessorTable
+        return protos.VotingService.internal_static_protos_StartorStopRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                protos.VotingService.VoteStatus.class, protos.VotingService.VoteStatus.Builder.class);
+                protos.VotingService.StartorStopRequest.class, protos.VotingService.StartorStopRequest.Builder.class);
       }
 
-      // Construct using protos.VotingService.VoteStatus.newBuilder()
+      // Construct using protos.VotingService.StartorStopRequest.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -947,31 +1400,40 @@ public final class VotingService {
       }
       public Builder clear() {
         super.clear();
-        status_ = false;
+        state_ = "";
+
+        startedCounter_ = 0;
+
+        first_ = false;
+
+        startOrStop_ = false;
 
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return protos.VotingService.internal_static_protos_VoteStatus_descriptor;
+        return protos.VotingService.internal_static_protos_StartorStopRequest_descriptor;
       }
 
-      public protos.VotingService.VoteStatus getDefaultInstanceForType() {
-        return protos.VotingService.VoteStatus.getDefaultInstance();
+      public protos.VotingService.StartorStopRequest getDefaultInstanceForType() {
+        return protos.VotingService.StartorStopRequest.getDefaultInstance();
       }
 
-      public protos.VotingService.VoteStatus build() {
-        protos.VotingService.VoteStatus result = buildPartial();
+      public protos.VotingService.StartorStopRequest build() {
+        protos.VotingService.StartorStopRequest result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public protos.VotingService.VoteStatus buildPartial() {
-        protos.VotingService.VoteStatus result = new protos.VotingService.VoteStatus(this);
-        result.status_ = status_;
+      public protos.VotingService.StartorStopRequest buildPartial() {
+        protos.VotingService.StartorStopRequest result = new protos.VotingService.StartorStopRequest(this);
+        result.state_ = state_;
+        result.startedCounter_ = startedCounter_;
+        result.first_ = first_;
+        result.startOrStop_ = startOrStop_;
         onBuilt();
         return result;
       }
@@ -1003,18 +1465,28 @@ public final class VotingService {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof protos.VotingService.VoteStatus) {
-          return mergeFrom((protos.VotingService.VoteStatus)other);
+        if (other instanceof protos.VotingService.StartorStopRequest) {
+          return mergeFrom((protos.VotingService.StartorStopRequest)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(protos.VotingService.VoteStatus other) {
-        if (other == protos.VotingService.VoteStatus.getDefaultInstance()) return this;
-        if (other.getStatus() != false) {
-          setStatus(other.getStatus());
+      public Builder mergeFrom(protos.VotingService.StartorStopRequest other) {
+        if (other == protos.VotingService.StartorStopRequest.getDefaultInstance()) return this;
+        if (!other.getState().isEmpty()) {
+          state_ = other.state_;
+          onChanged();
+        }
+        if (other.getStartedCounter() != 0) {
+          setStartedCounter(other.getStartedCounter());
+        }
+        if (other.getFirst() != false) {
+          setFirst(other.getFirst());
+        }
+        if (other.getStartOrStop() != false) {
+          setStartOrStop(other.getStartOrStop());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1029,11 +1501,11 @@ public final class VotingService {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        protos.VotingService.VoteStatus parsedMessage = null;
+        protos.VotingService.StartorStopRequest parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (protos.VotingService.VoteStatus) e.getUnfinishedMessage();
+          parsedMessage = (protos.VotingService.StartorStopRequest) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -1043,28 +1515,149 @@ public final class VotingService {
         return this;
       }
 
-      private boolean status_ ;
+      private java.lang.Object state_ = "";
       /**
-       * <code>bool status = 1;</code>
+       * <code>string state = 1;</code>
        */
-      public boolean getStatus() {
-        return status_;
+      public java.lang.String getState() {
+        java.lang.Object ref = state_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          state_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>bool status = 1;</code>
+       * <code>string state = 1;</code>
        */
-      public Builder setStatus(boolean value) {
-        
-        status_ = value;
+      public com.google.protobuf.ByteString
+          getStateBytes() {
+        java.lang.Object ref = state_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          state_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string state = 1;</code>
+       */
+      public Builder setState(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        state_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>bool status = 1;</code>
+       * <code>string state = 1;</code>
        */
-      public Builder clearStatus() {
+      public Builder clearState() {
         
-        status_ = false;
+        state_ = getDefaultInstance().getState();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string state = 1;</code>
+       */
+      public Builder setStateBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        state_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int startedCounter_ ;
+      /**
+       * <code>int32 started_counter = 2;</code>
+       */
+      public int getStartedCounter() {
+        return startedCounter_;
+      }
+      /**
+       * <code>int32 started_counter = 2;</code>
+       */
+      public Builder setStartedCounter(int value) {
+        
+        startedCounter_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 started_counter = 2;</code>
+       */
+      public Builder clearStartedCounter() {
+        
+        startedCounter_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private boolean first_ ;
+      /**
+       * <code>bool first = 3;</code>
+       */
+      public boolean getFirst() {
+        return first_;
+      }
+      /**
+       * <code>bool first = 3;</code>
+       */
+      public Builder setFirst(boolean value) {
+        
+        first_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool first = 3;</code>
+       */
+      public Builder clearFirst() {
+        
+        first_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean startOrStop_ ;
+      /**
+       * <code>bool start_or_stop = 4;</code>
+       */
+      public boolean getStartOrStop() {
+        return startOrStop_;
+      }
+      /**
+       * <code>bool start_or_stop = 4;</code>
+       */
+      public Builder setStartOrStop(boolean value) {
+        
+        startOrStop_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool start_or_stop = 4;</code>
+       */
+      public Builder clearStartOrStop() {
+        
+        startOrStop_ = false;
         onChanged();
         return this;
       }
@@ -1079,39 +1672,1405 @@ public final class VotingService {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:protos.VoteStatus)
+      // @@protoc_insertion_point(builder_scope:protos.StartorStopRequest)
     }
 
-    // @@protoc_insertion_point(class_scope:protos.VoteStatus)
-    private static final protos.VotingService.VoteStatus DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:protos.StartorStopRequest)
+    private static final protos.VotingService.StartorStopRequest DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new protos.VotingService.VoteStatus();
+      DEFAULT_INSTANCE = new protos.VotingService.StartorStopRequest();
     }
 
-    public static protos.VotingService.VoteStatus getDefaultInstance() {
+    public static protos.VotingService.StartorStopRequest getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<VoteStatus>
-        PARSER = new com.google.protobuf.AbstractParser<VoteStatus>() {
-      public VoteStatus parsePartialFrom(
+    private static final com.google.protobuf.Parser<StartorStopRequest>
+        PARSER = new com.google.protobuf.AbstractParser<StartorStopRequest>() {
+      public StartorStopRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new VoteStatus(input, extensionRegistry);
+        return new StartorStopRequest(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<VoteStatus> parser() {
+    public static com.google.protobuf.Parser<StartorStopRequest> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<VoteStatus> getParserForType() {
+    public com.google.protobuf.Parser<StartorStopRequest> getParserForType() {
       return PARSER;
     }
 
-    public protos.VotingService.VoteStatus getDefaultInstanceForType() {
+    public protos.VotingService.StartorStopRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ResultsRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:protos.ResultsRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string state = 1;</code>
+     */
+    java.lang.String getState();
+    /**
+     * <code>string state = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getStateBytes();
+
+    /**
+     * <code>int32 candidate = 2;</code>
+     */
+    int getCandidate();
+
+    /**
+     * <code>int32 electors = 3;</code>
+     */
+    int getElectors();
+  }
+  /**
+   * Protobuf type {@code protos.ResultsRequest}
+   */
+  public  static final class ResultsRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:protos.ResultsRequest)
+      ResultsRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ResultsRequest.newBuilder() to construct.
+    private ResultsRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ResultsRequest() {
+      state_ = "";
+      candidate_ = 0;
+      electors_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ResultsRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              state_ = s;
+              break;
+            }
+            case 16: {
+
+              candidate_ = input.readInt32();
+              break;
+            }
+            case 24: {
+
+              electors_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return protos.VotingService.internal_static_protos_ResultsRequest_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return protos.VotingService.internal_static_protos_ResultsRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              protos.VotingService.ResultsRequest.class, protos.VotingService.ResultsRequest.Builder.class);
+    }
+
+    public static final int STATE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object state_;
+    /**
+     * <code>string state = 1;</code>
+     */
+    public java.lang.String getState() {
+      java.lang.Object ref = state_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        state_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string state = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getStateBytes() {
+      java.lang.Object ref = state_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        state_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CANDIDATE_FIELD_NUMBER = 2;
+    private int candidate_;
+    /**
+     * <code>int32 candidate = 2;</code>
+     */
+    public int getCandidate() {
+      return candidate_;
+    }
+
+    public static final int ELECTORS_FIELD_NUMBER = 3;
+    private int electors_;
+    /**
+     * <code>int32 electors = 3;</code>
+     */
+    public int getElectors() {
+      return electors_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getStateBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, state_);
+      }
+      if (candidate_ != 0) {
+        output.writeInt32(2, candidate_);
+      }
+      if (electors_ != 0) {
+        output.writeInt32(3, electors_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getStateBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, state_);
+      }
+      if (candidate_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, candidate_);
+      }
+      if (electors_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, electors_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof protos.VotingService.ResultsRequest)) {
+        return super.equals(obj);
+      }
+      protos.VotingService.ResultsRequest other = (protos.VotingService.ResultsRequest) obj;
+
+      boolean result = true;
+      result = result && getState()
+          .equals(other.getState());
+      result = result && (getCandidate()
+          == other.getCandidate());
+      result = result && (getElectors()
+          == other.getElectors());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + STATE_FIELD_NUMBER;
+      hash = (53 * hash) + getState().hashCode();
+      hash = (37 * hash) + CANDIDATE_FIELD_NUMBER;
+      hash = (53 * hash) + getCandidate();
+      hash = (37 * hash) + ELECTORS_FIELD_NUMBER;
+      hash = (53 * hash) + getElectors();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static protos.VotingService.ResultsRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static protos.VotingService.ResultsRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static protos.VotingService.ResultsRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static protos.VotingService.ResultsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(protos.VotingService.ResultsRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code protos.ResultsRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:protos.ResultsRequest)
+        protos.VotingService.ResultsRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return protos.VotingService.internal_static_protos_ResultsRequest_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return protos.VotingService.internal_static_protos_ResultsRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                protos.VotingService.ResultsRequest.class, protos.VotingService.ResultsRequest.Builder.class);
+      }
+
+      // Construct using protos.VotingService.ResultsRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        state_ = "";
+
+        candidate_ = 0;
+
+        electors_ = 0;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return protos.VotingService.internal_static_protos_ResultsRequest_descriptor;
+      }
+
+      public protos.VotingService.ResultsRequest getDefaultInstanceForType() {
+        return protos.VotingService.ResultsRequest.getDefaultInstance();
+      }
+
+      public protos.VotingService.ResultsRequest build() {
+        protos.VotingService.ResultsRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public protos.VotingService.ResultsRequest buildPartial() {
+        protos.VotingService.ResultsRequest result = new protos.VotingService.ResultsRequest(this);
+        result.state_ = state_;
+        result.candidate_ = candidate_;
+        result.electors_ = electors_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof protos.VotingService.ResultsRequest) {
+          return mergeFrom((protos.VotingService.ResultsRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(protos.VotingService.ResultsRequest other) {
+        if (other == protos.VotingService.ResultsRequest.getDefaultInstance()) return this;
+        if (!other.getState().isEmpty()) {
+          state_ = other.state_;
+          onChanged();
+        }
+        if (other.getCandidate() != 0) {
+          setCandidate(other.getCandidate());
+        }
+        if (other.getElectors() != 0) {
+          setElectors(other.getElectors());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        protos.VotingService.ResultsRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (protos.VotingService.ResultsRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object state_ = "";
+      /**
+       * <code>string state = 1;</code>
+       */
+      public java.lang.String getState() {
+        java.lang.Object ref = state_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          state_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string state = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getStateBytes() {
+        java.lang.Object ref = state_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          state_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string state = 1;</code>
+       */
+      public Builder setState(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        state_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string state = 1;</code>
+       */
+      public Builder clearState() {
+        
+        state_ = getDefaultInstance().getState();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string state = 1;</code>
+       */
+      public Builder setStateBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        state_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int candidate_ ;
+      /**
+       * <code>int32 candidate = 2;</code>
+       */
+      public int getCandidate() {
+        return candidate_;
+      }
+      /**
+       * <code>int32 candidate = 2;</code>
+       */
+      public Builder setCandidate(int value) {
+        
+        candidate_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 candidate = 2;</code>
+       */
+      public Builder clearCandidate() {
+        
+        candidate_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int electors_ ;
+      /**
+       * <code>int32 electors = 3;</code>
+       */
+      public int getElectors() {
+        return electors_;
+      }
+      /**
+       * <code>int32 electors = 3;</code>
+       */
+      public Builder setElectors(int value) {
+        
+        electors_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 electors = 3;</code>
+       */
+      public Builder clearElectors() {
+        
+        electors_ = 0;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:protos.ResultsRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:protos.ResultsRequest)
+    private static final protos.VotingService.ResultsRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new protos.VotingService.ResultsRequest();
+    }
+
+    public static protos.VotingService.ResultsRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ResultsRequest>
+        PARSER = new com.google.protobuf.AbstractParser<ResultsRequest>() {
+      public ResultsRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ResultsRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ResultsRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ResultsRequest> getParserForType() {
+      return PARSER;
+    }
+
+    public protos.VotingService.ResultsRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface VoteDeleteOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:protos.VoteDelete)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int32 voter_id = 1;</code>
+     */
+    int getVoterId();
+
+    /**
+     * <code>int32 previousVote = 2;</code>
+     */
+    int getPreviousVote();
+
+    /**
+     * <code>string previousTime = 3;</code>
+     */
+    java.lang.String getPreviousTime();
+    /**
+     * <code>string previousTime = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getPreviousTimeBytes();
+
+    /**
+     * <code>bool deleteSuccess = 4;</code>
+     */
+    boolean getDeleteSuccess();
+  }
+  /**
+   * Protobuf type {@code protos.VoteDelete}
+   */
+  public  static final class VoteDelete extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:protos.VoteDelete)
+      VoteDeleteOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use VoteDelete.newBuilder() to construct.
+    private VoteDelete(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private VoteDelete() {
+      voterId_ = 0;
+      previousVote_ = 0;
+      previousTime_ = "";
+      deleteSuccess_ = false;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private VoteDelete(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+
+              voterId_ = input.readInt32();
+              break;
+            }
+            case 16: {
+
+              previousVote_ = input.readInt32();
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              previousTime_ = s;
+              break;
+            }
+            case 32: {
+
+              deleteSuccess_ = input.readBool();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return protos.VotingService.internal_static_protos_VoteDelete_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return protos.VotingService.internal_static_protos_VoteDelete_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              protos.VotingService.VoteDelete.class, protos.VotingService.VoteDelete.Builder.class);
+    }
+
+    public static final int VOTER_ID_FIELD_NUMBER = 1;
+    private int voterId_;
+    /**
+     * <code>int32 voter_id = 1;</code>
+     */
+    public int getVoterId() {
+      return voterId_;
+    }
+
+    public static final int PREVIOUSVOTE_FIELD_NUMBER = 2;
+    private int previousVote_;
+    /**
+     * <code>int32 previousVote = 2;</code>
+     */
+    public int getPreviousVote() {
+      return previousVote_;
+    }
+
+    public static final int PREVIOUSTIME_FIELD_NUMBER = 3;
+    private volatile java.lang.Object previousTime_;
+    /**
+     * <code>string previousTime = 3;</code>
+     */
+    public java.lang.String getPreviousTime() {
+      java.lang.Object ref = previousTime_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        previousTime_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string previousTime = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPreviousTimeBytes() {
+      java.lang.Object ref = previousTime_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        previousTime_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DELETESUCCESS_FIELD_NUMBER = 4;
+    private boolean deleteSuccess_;
+    /**
+     * <code>bool deleteSuccess = 4;</code>
+     */
+    public boolean getDeleteSuccess() {
+      return deleteSuccess_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (voterId_ != 0) {
+        output.writeInt32(1, voterId_);
+      }
+      if (previousVote_ != 0) {
+        output.writeInt32(2, previousVote_);
+      }
+      if (!getPreviousTimeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, previousTime_);
+      }
+      if (deleteSuccess_ != false) {
+        output.writeBool(4, deleteSuccess_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (voterId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, voterId_);
+      }
+      if (previousVote_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, previousVote_);
+      }
+      if (!getPreviousTimeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, previousTime_);
+      }
+      if (deleteSuccess_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, deleteSuccess_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof protos.VotingService.VoteDelete)) {
+        return super.equals(obj);
+      }
+      protos.VotingService.VoteDelete other = (protos.VotingService.VoteDelete) obj;
+
+      boolean result = true;
+      result = result && (getVoterId()
+          == other.getVoterId());
+      result = result && (getPreviousVote()
+          == other.getPreviousVote());
+      result = result && getPreviousTime()
+          .equals(other.getPreviousTime());
+      result = result && (getDeleteSuccess()
+          == other.getDeleteSuccess());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + VOTER_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getVoterId();
+      hash = (37 * hash) + PREVIOUSVOTE_FIELD_NUMBER;
+      hash = (53 * hash) + getPreviousVote();
+      hash = (37 * hash) + PREVIOUSTIME_FIELD_NUMBER;
+      hash = (53 * hash) + getPreviousTime().hashCode();
+      hash = (37 * hash) + DELETESUCCESS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getDeleteSuccess());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static protos.VotingService.VoteDelete parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static protos.VotingService.VoteDelete parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static protos.VotingService.VoteDelete parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static protos.VotingService.VoteDelete parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(protos.VotingService.VoteDelete prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code protos.VoteDelete}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:protos.VoteDelete)
+        protos.VotingService.VoteDeleteOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return protos.VotingService.internal_static_protos_VoteDelete_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return protos.VotingService.internal_static_protos_VoteDelete_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                protos.VotingService.VoteDelete.class, protos.VotingService.VoteDelete.Builder.class);
+      }
+
+      // Construct using protos.VotingService.VoteDelete.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        voterId_ = 0;
+
+        previousVote_ = 0;
+
+        previousTime_ = "";
+
+        deleteSuccess_ = false;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return protos.VotingService.internal_static_protos_VoteDelete_descriptor;
+      }
+
+      public protos.VotingService.VoteDelete getDefaultInstanceForType() {
+        return protos.VotingService.VoteDelete.getDefaultInstance();
+      }
+
+      public protos.VotingService.VoteDelete build() {
+        protos.VotingService.VoteDelete result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public protos.VotingService.VoteDelete buildPartial() {
+        protos.VotingService.VoteDelete result = new protos.VotingService.VoteDelete(this);
+        result.voterId_ = voterId_;
+        result.previousVote_ = previousVote_;
+        result.previousTime_ = previousTime_;
+        result.deleteSuccess_ = deleteSuccess_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof protos.VotingService.VoteDelete) {
+          return mergeFrom((protos.VotingService.VoteDelete)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(protos.VotingService.VoteDelete other) {
+        if (other == protos.VotingService.VoteDelete.getDefaultInstance()) return this;
+        if (other.getVoterId() != 0) {
+          setVoterId(other.getVoterId());
+        }
+        if (other.getPreviousVote() != 0) {
+          setPreviousVote(other.getPreviousVote());
+        }
+        if (!other.getPreviousTime().isEmpty()) {
+          previousTime_ = other.previousTime_;
+          onChanged();
+        }
+        if (other.getDeleteSuccess() != false) {
+          setDeleteSuccess(other.getDeleteSuccess());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        protos.VotingService.VoteDelete parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (protos.VotingService.VoteDelete) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int voterId_ ;
+      /**
+       * <code>int32 voter_id = 1;</code>
+       */
+      public int getVoterId() {
+        return voterId_;
+      }
+      /**
+       * <code>int32 voter_id = 1;</code>
+       */
+      public Builder setVoterId(int value) {
+        
+        voterId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 voter_id = 1;</code>
+       */
+      public Builder clearVoterId() {
+        
+        voterId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int previousVote_ ;
+      /**
+       * <code>int32 previousVote = 2;</code>
+       */
+      public int getPreviousVote() {
+        return previousVote_;
+      }
+      /**
+       * <code>int32 previousVote = 2;</code>
+       */
+      public Builder setPreviousVote(int value) {
+        
+        previousVote_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 previousVote = 2;</code>
+       */
+      public Builder clearPreviousVote() {
+        
+        previousVote_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object previousTime_ = "";
+      /**
+       * <code>string previousTime = 3;</code>
+       */
+      public java.lang.String getPreviousTime() {
+        java.lang.Object ref = previousTime_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          previousTime_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string previousTime = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPreviousTimeBytes() {
+        java.lang.Object ref = previousTime_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          previousTime_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string previousTime = 3;</code>
+       */
+      public Builder setPreviousTime(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        previousTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string previousTime = 3;</code>
+       */
+      public Builder clearPreviousTime() {
+        
+        previousTime_ = getDefaultInstance().getPreviousTime();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string previousTime = 3;</code>
+       */
+      public Builder setPreviousTimeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        previousTime_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean deleteSuccess_ ;
+      /**
+       * <code>bool deleteSuccess = 4;</code>
+       */
+      public boolean getDeleteSuccess() {
+        return deleteSuccess_;
+      }
+      /**
+       * <code>bool deleteSuccess = 4;</code>
+       */
+      public Builder setDeleteSuccess(boolean value) {
+        
+        deleteSuccess_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool deleteSuccess = 4;</code>
+       */
+      public Builder clearDeleteSuccess() {
+        
+        deleteSuccess_ = false;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:protos.VoteDelete)
+    }
+
+    // @@protoc_insertion_point(class_scope:protos.VoteDelete)
+    private static final protos.VotingService.VoteDelete DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new protos.VotingService.VoteDelete();
+    }
+
+    public static protos.VotingService.VoteDelete getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<VoteDelete>
+        PARSER = new com.google.protobuf.AbstractParser<VoteDelete>() {
+      public VoteDelete parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new VoteDelete(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<VoteDelete> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<VoteDelete> getParserForType() {
+      return PARSER;
+    }
+
+    public protos.VotingService.VoteDelete getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -1123,10 +3082,20 @@ public final class VotingService {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_protos_VoteRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_protos_VoteStatus_descriptor;
+    internal_static_protos_StartorStopRequest_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_protos_VoteStatus_fieldAccessorTable;
+      internal_static_protos_StartorStopRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_protos_ResultsRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_protos_ResultsRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_protos_VoteDelete_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_protos_VoteDelete_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1136,12 +3105,25 @@ public final class VotingService {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\024Voting_service.proto\022\006protos\"F\n\013VoteRe" +
-      "quest\022\020\n\010voter_id\030\001 \001(\005\022\027\n\017voter_candida" +
-      "te\030\002 \001(\005\022\014\n\004time\030\003 \001(\t\"\034\n\nVoteStatus\022\016\n\006" +
-      "status\030\001 \001(\0102@\n\013VoteService\0221\n\004Vote\022\023.pr" +
-      "otos.VoteRequest\032\022.protos.VoteStatus\"\000b\006" +
-      "proto3"
+      "\n\024Voting_service.proto\022\006protos\"\234\001\n\013VoteR" +
+      "equest\022\020\n\010voter_id\030\001 \001(\005\022\027\n\017voter_candid" +
+      "ate\030\002 \001(\005\022\014\n\004time\030\003 \001(\t\022\023\n\013leader_sent\030\004" +
+      " \001(\010\022\023\n\013accepted_by\030\005 \001(\t\022\025\n\rvote_accept" +
+      "ed\030\006 \001(\010\022\023\n\013leader_done\030\007 \001(\010\"b\n\022Startor" +
+      "StopRequest\022\r\n\005state\030\001 \001(\t\022\027\n\017started_co" +
+      "unter\030\002 \001(\005\022\r\n\005first\030\003 \001(\010\022\025\n\rstart_or_s" +
+      "top\030\004 \001(\010\"D\n\016ResultsRequest\022\r\n\005state\030\001 \001" +
+      "(\t\022\021\n\tcandidate\030\002 \001(\005\022\020\n\010electors\030\003 \001(\005\"" +
+      "a\n\nVoteDelete\022\020\n\010voter_id\030\001 \001(\005\022\024\n\014previ" +
+      "ousVote\030\002 \001(\005\022\024\n\014previousTime\030\003 \001(\t\022\025\n\rd" +
+      "eleteSuccess\030\004 \001(\0102\214\002\n\013VoteService\0222\n\004Vo" +
+      "te\022\023.protos.VoteRequest\032\023.protos.VoteReq" +
+      "uest\"\000\022L\n\020StartorStopState\022\032.protos.Star" +
+      "torStopRequest\032\032.protos.StartorStopReque" +
+      "st\"\000\0226\n\nDeleteVote\022\022.protos.VoteDelete\032\022" +
+      ".protos.VoteDelete\"\000\022C\n\017ElectionResults\022" +
+      "\026.protos.ResultsRequest\032\026.protos.Results" +
+      "Request\"\000b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1160,13 +3142,25 @@ public final class VotingService {
     internal_static_protos_VoteRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_protos_VoteRequest_descriptor,
-        new java.lang.String[] { "VoterId", "VoterCandidate", "Time", });
-    internal_static_protos_VoteStatus_descriptor =
+        new java.lang.String[] { "VoterId", "VoterCandidate", "Time", "LeaderSent", "AcceptedBy", "VoteAccepted", "LeaderDone", });
+    internal_static_protos_StartorStopRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
-    internal_static_protos_VoteStatus_fieldAccessorTable = new
+    internal_static_protos_StartorStopRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_protos_VoteStatus_descriptor,
-        new java.lang.String[] { "Status", });
+        internal_static_protos_StartorStopRequest_descriptor,
+        new java.lang.String[] { "State", "StartedCounter", "First", "StartOrStop", });
+    internal_static_protos_ResultsRequest_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_protos_ResultsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_protos_ResultsRequest_descriptor,
+        new java.lang.String[] { "State", "Candidate", "Electors", });
+    internal_static_protos_VoteDelete_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_protos_VoteDelete_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_protos_VoteDelete_descriptor,
+        new java.lang.String[] { "VoterId", "PreviousVote", "PreviousTime", "DeleteSuccess", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
