@@ -14,7 +14,7 @@ public class VotingServerStubs {
                 .intercept(new Decorator(0))
                 .usePlaintext()
                 .build();
-        stub = VoteServiceGrpc.newBlockingStub(channel);
+        stub = VoteServiceGrpc.newBlockingStub(channel); 
     }
 
     public void shutdown() {
