@@ -9,7 +9,6 @@ import VotingServerImpl.util.ZkServiceAPI;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.IZkChildListener;
-import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 
 @Setter
 @Slf4j

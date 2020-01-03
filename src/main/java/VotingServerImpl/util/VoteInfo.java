@@ -2,7 +2,6 @@ package VotingServerImpl.util;
 
 import lombok.Getter;
 import lombok.Setter;
-import protos.VoteServiceGrpc;
 
 import java.sql.Timestamp;
 

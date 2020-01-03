@@ -6,29 +6,18 @@ import VotingServerImpl.util.ClusterData;
 import VotingServerImpl.util.HostIP;
 import VotingServerImpl.util.Implmentation.ZkServiceImplmentation;
 import VotingServerImpl.util.VoteInfo;
-import VotingServerImpl.util.ZkServiceAPI;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.stub.StreamObserver;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.server.quorum.Vote;
 import protos.VoteServiceGrpc;
 import protos.VotingService;
-import java.io.IOException;
-import java.sql.Time;
+
 import java.sql.Timestamp;
 import java.util.*;
 
-import org.I0Itec.zkclient.IZkChildListener;
-import org.I0Itec.zkclient.IZkStateListener;
-import VotingServerImpl.util.Implmentation.*;
-
 //TODO: change from checking zookeeper all the time to checkiong the ClusterInfo struct
 
-import org.apache.zookeeper.*;
-    @Slf4j
+@Slf4j
     public class VotingServerImpl extends VoteServiceGrpc.VoteServiceImplBase {
         private String HostName;
         private Server VoteServer;
