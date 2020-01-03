@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 public class ClusterData {
 
-    public static final String LEADER_ELECTION = "/leader_election_app/";
-    public static final String MEMBERSHIP_APP = "/membership_app/";
+    public static final String LEADER_ELECTION = "/leader_election_app";
+    public static final String MEMBERSHIP_APP = "/membership_app";
 
     private static ClusterData clusterdata = new ClusterData();
 
