@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ComiteeClient" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="ComiteeClient -start" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="ComiteeClient.ComiteeClient" />
     <module name="DS" />
-    <option name="PROGRAM_PARAMETERS" value="localhost:5050 stop_all" />
+    <option name="PROGRAM_PARAMETERS" value="localhost:5050 start_all" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="ComiteeClient.*" />
