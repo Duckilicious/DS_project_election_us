@@ -1,5 +1,6 @@
 package VotingServerImpl.GrpcServer;
 
+import RESTredirectionService.models.Vote;
 import VotingServerImpl.ZkListeners.MasterChangeListener;
 import VotingServerImpl.ZkListeners.MembershipListener;
 import VotingServerImpl.util.ClusterData;
@@ -106,124 +107,131 @@ import java.util.*;
         @Override
         public void vote(protos.VotingService.VoteRequest request,
                          io.grpc.stub.StreamObserver<protos.VotingService.VoteRequest> responseObserver) {
-        if(service_start){
-            if (isNodeLeader()) {
-                int counter = 0;
-                Date date = new Date();
-                long time = date.getTime();
-                Timestamp ts = new Timestamp(time);
-                List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
-                alive_nodes.remove(HostName);
-                stubs = updateAlive(alive_nodes);
+        if(!service_start) {
+            VotingService.VoteRequest reply = VotingService.VoteRequest.newBuilder()
+                    .setVoteAccepted(false).build();
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+            log.info("ID {} tried to vote before or after the election started", request.getVoterId());
+            return;
+        }
+        if (isNodeLeader()) {
+            int counter = 0;
+            Date date = new Date();
+            long time = date.getTime();
+            Timestamp ts = new Timestamp(time);
+            List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
+            alive_nodes.remove(HostName);
+            stubs = updateAlive(alive_nodes);
 
-                //Create a new request for all servers with a new time stamp
-                protos.VotingService.VoteRequest newRequest = protos.VotingService.VoteRequest
+            //Create a new request for all servers with a new time stamp
+            protos.VotingService.VoteRequest newRequest = protos.VotingService.VoteRequest
+                    .newBuilder()
+                    .setLeaderSent(true)
+                    .setTime(ts.toString())
+                    .setVoterId(request.getVoterId())
+                    .setVoterCandidate(request.getVoterCandidate())
+                    .build();
+            //
+            log.info("Leader set time for vote, total order was established");
+            for (VotingServerStubs temp : stubs) {
+                protos.VotingService.VoteRequest reply = temp.stub.vote(newRequest);
+                if(reply.getVoteAccepted()) {
+                    counter ++;
+                }
+            }
+            //every alive member updated updated
+            if (counter == alive_nodes.size()){
+                log.info("Vote accepted by the entire cluster");
+                votes.put(request.getVoterId(),
+                        new VoteInfo(request.getVoterId(),
+                        ts,
+                        request.getVoterCandidate() ));
+                protos.VotingService.VoteRequest respond = protos.VotingService.VoteRequest
                         .newBuilder()
                         .setLeaderSent(true)
                         .setTime(ts.toString())
                         .setVoterId(request.getVoterId())
+                        .setVoteAccepted(true)
+                        .setLeaderDone(true)
+                        .setAcceptedBy("all cluster")
                         .setVoterCandidate(request.getVoterCandidate())
                         .build();
-                //
-                log.info("Leader set time for vote, total order was established");
-                for (VotingServerStubs temp : stubs) {
-                    protos.VotingService.VoteRequest reply = temp.stub.vote(newRequest);
-                    if(reply.getLeaderSent()) {
-                        counter ++;
-                    }
-                }
-
-                //every alive member updated updated
-                if (counter == alive_nodes.size()){
-
-                    votes.put(request.getVoterId(),
-                            new VoteInfo(request.getVoterId(),
-                            Timestamp.valueOf(request.getTime()),
-                            request.getVoterCandidate() ));
-                    protos.VotingService.VoteRequest respond = protos.VotingService.VoteRequest
-                            .newBuilder()
-                            .setLeaderSent(true)
-                            .setTime(ts.toString())
-                            .setVoterId(request.getVoterId())
-                            .setVoteAccepted(true)
-                            .setLeaderDone(true)
-                            .setAcceptedBy("all cluster")
-                            .setVoterCandidate(request.getVoterCandidate())
-                            .build();
-                    try {
-                        responseObserver.onNext(respond);
-                        responseObserver.onCompleted();
-                    }
-                    catch(Exception e) {
-                        log.info("Wasn't able to send ack to the requester rolling back vote");
-                        rollbackRequest(request, responseObserver, ts, false);
-                    }
-
+                try {
+                    responseObserver.onNext(respond);
+                    responseObserver.onCompleted();
                     log.info("Vote recorded for {}", request.getVoterId());
+
                 }
-                //updating failed -- keeping atomicity
-                else {
-                        rollbackRequest(request, responseObserver, ts, true);
-                    }
+                catch(Exception e) {
+                    log.info("Wasn't able to send ack to the requester rolling back vote");
+                    rollbackRequest(request, responseObserver, ts, false);
                 }
             }
+            //updating failed -- keeping atomicity
             else {
-                //We got the correct timestamp
-                if (request.getLeaderSent()) {
-                    //we need to respond to the redirection server or we need to respond to leader
-                    if(request.getLeaderDone()) {
+                    rollbackRequest(request, responseObserver, ts, true);
+                }
+        }
+        //Node isn't leader
+        else {
+            //We got the correct timestamp
+            if (request.getLeaderSent()) {
+                //See if we need to update
+                    VoteInfo info = votes.get(request.getVoterId());
+                    if (info == null || info.getTime().before(Timestamp.valueOf(request.getTime()))) {
+                        votes.remove(request.getVoterId());
+                        votes.put(request.getVoterId(), new VoteInfo(request.getVoterId(),
+                                Timestamp.valueOf(request.getTime()),
+                                request.getVoterCandidate()));
+                        log.info("Vote was recorded");
+                    }
+                    log.info("Trying to send ack to leader");
+                    VotingService.VoteRequest respond = VotingService.VoteRequest
+                            .newBuilder()
+                            .setAcceptedBy(HostName)
+                            .setLeaderSent(false)
+                            .setVoteAccepted(true)
+                            .setVoterId(request.getVoterId())
+                            .setTime(request.getTime())
+                            .setLeaderDone(false)
+                            .build();
 
                         try {
-                            responseObserver.onNext(request);
+                            responseObserver.onNext(respond);
                             responseObserver.onCompleted();
                         }
                         catch (Exception e) {
-                            log.error("REST server wasn't able to accept ack, rolling back vote");
-                            List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
-                            stubs = updateAlive(alive_nodes);
-                            rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
+                            log.error("Was unable to send ack to leader, rolling back solo");
+                            votes.remove(request.getVoterId());
+                            votes.put(info.getVoterID(), info);
+                            log.error("Rollback Solo succeeded");
                         }
+                }
+            else {
+                String leader = zkServiceAPI.getLeaderNodeData(cluster_state_name);
+                String[] parts = leader.split(":");
+                VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
+                log.info("Sent to leader to create total order");
+                VotingService.VoteRequest respond = leaderStub.stub.vote(request);
+
+
+                if(respond.getLeaderDone()) {
+                    try {
+                        responseObserver.onNext(request);
+                        responseObserver.onCompleted();
                         log.info("Sending back info to REST server");
                     }
-                    //See if we need to update
-                    else {
-                        VoteInfo info = votes.get(request.getVoterId());
-                        if (info.getTime().before(Timestamp.valueOf(request.getTime()))) {
-                            votes.remove(request.getVoterId());
-                            votes.put(request.getVoterId(), new VoteInfo(request.getVoterId(),
-                                    Timestamp.valueOf(request.getTime()),
-                                    request.getVoterCandidate()));
-                            log.info("Vote was recorded");
-                        }
-                        VotingService.VoteRequest respond = VotingService.VoteRequest
-                                .newBuilder()
-                                .setAcceptedBy(HostName)
-                                .setLeaderSent(false)
-                                .setVoteAccepted(true)
-                                .setVoterId(request.getVoterId())
-                                .setTime(request.getTime())
-                                .setLeaderDone(false)
-                                .build();
-                            try {
-                                responseObserver.onNext(respond);
-                                responseObserver.onCompleted();
-                            }
-                            catch (Exception e) {
-                                log.error("Was unable to send ack to leader, rolling back solo");
-                                votes.remove(request.getVoterId());
-                                votes.put(info.getVoterID(), info);
-                                log.error("Rollback Solo succeeded");
-                            }
+                    catch (Exception e) {
+                        log.error("REST server wasn't able to accept ack, rolling back vote");
+                        List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
+                        stubs = updateAlive(alive_nodes);
+                        rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
                     }
                 }
-                else {
-                    String leader = zkServiceAPI.getLeaderNodeData(cluster_state_name);
-                    String[] parts = leader.split(":");
-                    VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
-                    leaderStub.stub.vote(request);
-                    log.info("Sent to leader to create total order");
-                }
             }
+            }
+
         }
 
 

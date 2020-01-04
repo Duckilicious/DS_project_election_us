@@ -9,6 +9,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.slf4j.LoggerFactory;
 import protos.VotingService;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,28 +152,30 @@ public class ComiteeClient {
     }
 
     public void electionResults() {
-        ArrayList<Integer>  results = new ArrayList<Integer>();
+        int[]  results = new int[50];
         int winningStateCandidate;
-        Integer winner = 0;
-
+        int winner = 0;
 
         for(String temp : stateList) {
-            winningStateCandidate = electionResultsForOneCluster(temp);
-            if(winningStateCandidate > results.size())
-                results.set(winningStateCandidate, StateElectors.get(temp));
-            else {
-                results.set(winningStateCandidate, results.get(winningStateCandidate) + StateElectors.get(temp));
+
+            try {
+                winningStateCandidate = electionResultsForOneCluster(temp);
+            }
+            catch (Exception e) {
+                log.error("No alive nodes in cluster" + temp);
+                continue;
+            }
+            results[winningStateCandidate] += StateElectors.get(temp);
+        }
+
+        for(int i = 0; i < 50; i ++) {
+            if(results[i] > results[winner]) {
+                winner = i;
             }
         }
 
-        for(Integer temp : results) {
-            if(temp > winner) {
-                winner = results.indexOf(temp);
-            }
-        }
-
-        System.out.println("The winner of the election is" + Integer.toString(winner) + "with num of electors" +
-                results.get(winner));
+        System.out.println("The winner of the election is " + Integer.toString(winner) + " with num of electors " +
+                Integer.toString(results[winner]));
     }
 
     public VotingServerStubs getStateStub(String state) {
@@ -182,7 +185,24 @@ public class ComiteeClient {
         }
         String hostname = hostNames.get(0);
         String[] ipPort = hostname.split(":");
+        log.info("state server " + ipPort[0] + ":" + ipPort[1]);
         return new VotingServerStubs(ipPort[0], Integer.parseInt(ipPort[1]));
+    }
+
+    public void vote(int id, int candidaator, String state){
+        VotingServerStubs stub = getStateStub(state);
+        VotingService.VoteRequest sent_vote = VotingService.VoteRequest
+                .newBuilder()
+                .setVoterId(id)
+                .setVoteAccepted(false)
+                .setLeaderSent(false)
+                .setVoterCandidate(candidaator)
+                .build();
+
+        VotingService.VoteRequest reply = stub.stub.vote(sent_vote);
+        log.info("vote from {} to candidator {} from state {} sent, vote accepted by {}", id, candidaator, state,
+                reply.getAcceptedBy());
+
     }
 
     public static void main(String[] args) {
@@ -208,6 +228,8 @@ public class ComiteeClient {
               case "get_results" :
                   client.electionResults();
                   break;
+              case "vote" :
+                  client.vote(3, 1, "new_york");
               default:
                   System.out.print(args[1] + "Command not recognized");
           }

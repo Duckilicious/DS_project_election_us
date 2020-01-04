@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ComiteeClient - vote" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="ComiteeClient.ComiteeClient" />
+    <module name="DS" />
+    <option name="PROGRAM_PARAMETERS" value="localhost:5050 vote" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="ComiteeClient.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -50,10 +50,12 @@ public class VoteController {
         Random rand = new Random();
         int i = rand.nextInt(size);
         String live_node = zkservice.getLiveNodes(newVote.getState()).get(i);
-        String ip_and_port = zkservice.getZNodeData(ClusterData.MEMBERSHIP_APP + newVote.getState() + "/" + live_node);
-        String[] parts = ip_and_port.split(":");
+        String[] parts = live_node.split(":");
         VotingServerImpl.GrpcServer.VotingServerStubs stub = new VotingServerStubs(parts[0],Integer.parseInt(parts[1]));
         protos.VotingService.VoteRequest reply = stub.stub.vote(vote);
+        if(!reply.getVoteAccepted()){
+
+        }
         votes.put(eid.getAndIncrement(), newVote);
         return newVote;
     }
