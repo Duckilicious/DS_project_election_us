@@ -3,19 +3,14 @@ package VotingServerImpl.util.Implmentation;
 import VotingServerImpl.util.ClusterData;
 import VotingServerImpl.util.StringSerializer;
 import VotingServerImpl.util.ZkServiceAPI;
-import VotingServerImpl.util.ClusterData.*;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.IZkChildListener;
-import org.I0Itec.zkclient.IZkStateListener;
 import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.exception.ZkNodeExistsException;
-import org.I0Itec.zkclient.serialize.ZkSerializer;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.ZooDefs;
 
 @Slf4j
 public class ZkServiceImplmentation implements ZkServiceAPI {
@@ -33,7 +28,7 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
 
     @Override
     public String getLeaderNodeData(String state) {
-        state = state + "/";
+        state = "/" + state;
         if(!zkClient.exists(ClusterData.LEADER_ELECTION + state)) {
             throw new RuntimeException("No node " + ClusterData.LEADER_ELECTION + "exists");
         }
@@ -41,18 +36,18 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
         List<String> nodesInElection = zkClient.getChildren(ClusterData.LEADER_ELECTION + state);
         Collections.sort(nodesInElection);
         String leader = nodesInElection.get(0);
-        return getZNodeData(ClusterData.LEADER_ELECTION + state + leader);
+        return getZNodeData(ClusterData.LEADER_ELECTION + state + "/" + leader);
         }
 
 
 
     @Override
     public void addToLiveNodes(String nodeName, String data, String state) {
-        state = state + "/";
+        state = "/" + state ;
         if(!zkClient.exists(ClusterData.MEMBERSHIP_APP)){
             zkClient.create(ClusterData.MEMBERSHIP_APP, "all live nodes are displayed here", CreateMode.PERSISTENT);
         }
-        String childNode = ClusterData.MEMBERSHIP_APP + state + nodeName;
+        String childNode = ClusterData.MEMBERSHIP_APP + state + "/" + nodeName;
         if(zkClient.exists(childNode)){
             return;
         }
@@ -61,28 +56,33 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
 
     @Override
     public List<String> getLiveNodes(String state) {
-        state = state + "/";
-        if (!zkClient.exists(ClusterData.MEMBERSHIP_APP + state)) {
-            throw new RuntimeException("No node /liveNodes exists");
+        if(!state.equals("")) {
+            if (!zkClient.exists(ClusterData.MEMBERSHIP_APP + "/" + state)) {
+                throw new RuntimeException("No node /liveNodes exists");
+            }
         }
-
-        return zkClient.getChildren(ClusterData.MEMBERSHIP_APP);
+        if(state.equals("")) {
+            return zkClient.getChildren(ClusterData.MEMBERSHIP_APP);
+        }
+        else {
+            return zkClient.getChildren(ClusterData.MEMBERSHIP_APP + "/" + state);
+        }
     }
 
 
     @Override
     public void createAllParentNodes(String state) {
         if(state != null){
-            state+= "/";
+            state = "/" + state;
         }
         else{
             state = "";
         }
-        if (!zkClient.exists(ClusterData.MEMBERSHIP_APP + state)) {
-            zkClient.create(ClusterData.MEMBERSHIP_APP + state, "all live nodes are displayed here", CreateMode.PERSISTENT);
+        if (!zkClient.exists(ClusterData.MEMBERSHIP_APP +  state)) {
+            zkClient.create(ClusterData.MEMBERSHIP_APP +  state, "all live nodes are displayed here", CreateMode.PERSISTENT);
         }
-        if (!zkClient.exists(ClusterData.LEADER_ELECTION + state)) {
-            zkClient.create(ClusterData.LEADER_ELECTION + state, "election node", CreateMode.PERSISTENT);
+        if (!zkClient.exists(ClusterData.LEADER_ELECTION +  state)) {
+            zkClient.create(ClusterData.LEADER_ELECTION +  state, "election node", CreateMode.PERSISTENT);
         }
     }
 
@@ -94,11 +94,11 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
 
     @Override
     public void createNodeInElectionZnode(String data, String state) {
-        state += "/";
-        if (!zkClient.exists(ClusterData.LEADER_ELECTION + state)) {
+        //state += "/";
+        if (!zkClient.exists(ClusterData.LEADER_ELECTION + "/" + state)) {
             zkClient.create(ClusterData.LEADER_ELECTION, "election node", CreateMode.PERSISTENT);
         }
-        zkClient.create(ClusterData.LEADER_ELECTION + state + "node", data, CreateMode.EPHEMERAL_SEQUENTIAL);
+        zkClient.create(ClusterData.LEADER_ELECTION + "/" + state + "/"  + "node", data, CreateMode.EPHEMERAL_SEQUENTIAL);
     }
 
     @Override

@@ -6,48 +6,38 @@ import VotingServerImpl.util.ClusterData;
 import VotingServerImpl.util.HostIP;
 import VotingServerImpl.util.Implmentation.ZkServiceImplmentation;
 import VotingServerImpl.util.VoteInfo;
-import VotingServerImpl.util.ZkServiceAPI;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.server.quorum.Vote;
 import protos.VoteServiceGrpc;
 import protos.VotingService;
-import java.io.IOException;
-import java.sql.Time;
+
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import org.I0Itec.zkclient.IZkChildListener;
-import org.I0Itec.zkclient.IZkStateListener;
-import VotingServerImpl.util.Implmentation.*;
+import java.util.*;
 
 //TODO: change from checking zookeeper all the time to checkiong the ClusterInfo struct
 
-import org.apache.zookeeper.*;
-    @Slf4j
+@Slf4j
     public class VotingServerImpl extends VoteServiceGrpc.VoteServiceImplBase {
         private String HostName;
         private Server VoteServer;
         private ZkServiceImplmentation zkServiceAPI;
         private String cluster_state_name;
         private Boolean service_start;
-        private List <VotingServerStubs> stubs;
+        private ArrayList<VotingServerStubs> stubs;
         private HashMap<Integer, VoteInfo> votes;
 
         public VotingServerImpl(String port, String hostList, String state) {
             cluster_state_name = state;
             service_start = false;
+            stubs = new ArrayList<VotingServerStubs>();
             votes = new HashMap<>(0);
             int portNum = Integer.parseInt(port);
             try {
                 VoteServer = ServerBuilder.forPort(portNum)
                         .addService(this)
                         .intercept(new Interceptor())
-                        .build()
-                        .start();
+                        .build();
                 HostName = HostIP.getIp()+":" + port;
                 log.info("Created Vote Server");
 
@@ -85,11 +75,20 @@ import org.apache.zookeeper.*;
             }
         }
 
-        public Boolean isNodeLeader(){
+        private Boolean isNodeLeader(){
             return zkServiceAPI.getLeaderNodeData(cluster_state_name).equals(this.HostName);
         }
 
-        private List<VotingServerStubs> updateAlive (List <String> alive_nodes) {
+        public void start() {
+            try {
+                VoteServer.start();
+            }
+            catch (Exception e){
+                throw new RuntimeException("server start failed", e);
+            }
+        }
+
+        private ArrayList<VotingServerStubs> updateAlive (List <String> alive_nodes) {
 
             //delete all previous stubs
             stubs.clear();
@@ -151,44 +150,20 @@ import org.apache.zookeeper.*;
                             .setAcceptedBy("all cluster")
                             .setVoterCandidate(request.getVoterCandidate())
                             .build();
-                    responseObserver.onNext(respond);
-                    responseObserver.onCompleted();
-                    log.info("Vote recorded for {}", request.getVoterId());
-                }
-
-                //updating failed -- keeping atomicity
-                else {
-                    int counter_delete = 0;
-                    VoteInfo info = (votes.get(request.getVoterId()));
-                    if(info != null) {
-                        for (VotingServerStubs temp : stubs) {
-                            VotingService.VoteDelete recent = VotingService.VoteDelete.newBuilder()
-                                    .setVoterId(info.getVoterID())
-                                    .setPreviousVote(info.getCandidate())
-                                    .setPreviousTime(info.getTime().toString())
-                                    .setDeleteSuccess(false)
-                                    .build();
-                            VotingService.VoteDelete reply = temp.stub.deleteVote(recent);
-                            if(reply.getDeleteSuccess()) {
-                                counter_delete++;
-                            }
-                            if (counter_delete != counter) {
-                                log.info("Data might be inconsistent");
-                            }
-                        }
-
-                        protos.VotingService.VoteRequest respond = protos.VotingService.VoteRequest
-                                .newBuilder()
-                                .setLeaderSent(true)
-                                .setTime(ts.toString())
-                                .setVoterId(request.getVoterId())
-                                .setVoteAccepted(false)
-                                .setLeaderDone(true)
-                                .setAcceptedBy("none")
-                                .setVoterCandidate(request.getVoterCandidate())
-                                .build();
+                    try {
                         responseObserver.onNext(respond);
                         responseObserver.onCompleted();
+                    }
+                    catch(Exception e) {
+                        log.info("Wasn't able to send ack to the requester rolling back vote");
+                        rollbackRequest(request, responseObserver, ts, false);
+                    }
+
+                    log.info("Vote recorded for {}", request.getVoterId());
+                }
+                //updating failed -- keeping atomicity
+                else {
+                        rollbackRequest(request, responseObserver, ts, true);
                     }
                 }
             }
@@ -197,8 +172,18 @@ import org.apache.zookeeper.*;
                 if (request.getLeaderSent()) {
                     //we need to respond to the redirection server or we need to respond to leader
                     if(request.getLeaderDone()) {
-                        responseObserver.onNext(request);
-                        responseObserver.onCompleted();
+
+                        try {
+                            responseObserver.onNext(request);
+                            responseObserver.onCompleted();
+                        }
+                        catch (Exception e) {
+                            log.error("REST server wasn't able to accept ack, rolling back vote");
+                            List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
+                            stubs = updateAlive(alive_nodes);
+                            rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
+                        }
+                        log.info("Sending back info to REST server");
                     }
                     //See if we need to update
                     else {
@@ -208,6 +193,7 @@ import org.apache.zookeeper.*;
                             votes.put(request.getVoterId(), new VoteInfo(request.getVoterId(),
                                     Timestamp.valueOf(request.getTime()),
                                     request.getVoterCandidate()));
+                            log.info("Vote was recorded");
                         }
                         VotingService.VoteRequest respond = VotingService.VoteRequest
                                 .newBuilder()
@@ -218,8 +204,16 @@ import org.apache.zookeeper.*;
                                 .setTime(request.getTime())
                                 .setLeaderDone(false)
                                 .build();
-                        responseObserver.onNext(respond);
-                        responseObserver.onCompleted();
+                            try {
+                                responseObserver.onNext(respond);
+                                responseObserver.onCompleted();
+                            }
+                            catch (Exception e) {
+                                log.error("Was unable to send ack to leader, rolling back solo");
+                                votes.remove(request.getVoterId());
+                                votes.put(info.getVoterID(), info);
+                                log.error("Rollback Solo succeeded");
+                            }
                     }
                 }
                 else {
@@ -227,9 +221,54 @@ import org.apache.zookeeper.*;
                     String[] parts = leader.split(":");
                     VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
                     leaderStub.stub.vote(request);
+                    log.info("Sent to leader to create total order");
                 }
             }
         }
+
+
+        private void rollbackRequest(VotingService.VoteRequest request,
+                                    io.grpc.stub.StreamObserver<protos.VotingService.VoteRequest> responseObserver,
+                                    Timestamp ts, boolean sendBack) {
+            int counter_delete = 0;
+            VoteInfo info = (votes.get(request.getVoterId()));
+            if (info != null) {
+                for (VotingServerStubs temp : stubs) {
+                    VotingService.VoteDelete recent = VotingService.VoteDelete.newBuilder()
+                            .setVoterId(info.getVoterID())
+                            .setPreviousVote(info.getCandidate())
+                            .setPreviousTime(info.getTime().toString())
+                            .setDeleteSuccess(false)
+                            .build();
+                    VotingService.VoteDelete reply = temp.stub.deleteVote(recent);
+                    if (reply.getDeleteSuccess()) {
+                        counter_delete++;
+                    }
+                }
+                log.info("Rollbacked {} servers", counter_delete);
+
+                if(sendBack) {
+                    protos.VotingService.VoteRequest respond = protos.VotingService.VoteRequest
+                            .newBuilder()
+                            .setLeaderSent(true)
+                            .setTime(ts.toString())
+                            .setVoterId(request.getVoterId())
+                            .setVoteAccepted(false)
+                            .setLeaderDone(true)
+                            .setAcceptedBy("none")
+                            .setVoterCandidate(request.getVoterCandidate())
+                            .build();
+
+                    try {
+                        responseObserver.onNext(respond);
+                        responseObserver.onCompleted();
+                    }
+                    catch (Exception e) {
+                        log.info("Couldn't send back the request but rollback was performed");
+                    }
+                }
+
+            }
         }
 
         @Override
@@ -257,7 +296,7 @@ import org.apache.zookeeper.*;
         @Override
         public void startorStopState(protos.VotingService.StartorStopRequest request,
                                io.grpc.stub.StreamObserver<protos.VotingService.StartorStopRequest> responseObserver) {
-
+            log.info("Received a startOrStop call");
             if (request.getFirst()) {
                 List<String> nodes = zkServiceAPI.getLiveNodes(request.getState());
                 nodes.remove(HostName);
@@ -273,22 +312,25 @@ import org.apache.zookeeper.*;
                             .setStartedCounter(0)
                             .setStartOrStop(request.getStartOrStop())
                             .build();
+                    log.info("sending request to:" + temp);
                     VotingService.StartorStopRequest reply = Stub.stub.startorStopState(startOthers);
                     if (reply.getStartedCounter() == 1) {
                         startedCounter++;
                     }
 
-                    VotingService.StartorStopRequest replyClient = VotingService.StartorStopRequest
-                            .newBuilder()
-                            .setState(request.getState())
-                            .setFirst(false)
-                            .setStartedCounter(startedCounter)
-                            .setStartOrStop(request.getStartOrStop())
-                            .build();
-                    responseObserver.onNext(replyClient);
-                    responseObserver.onCompleted();
                 }
+                startedCounter++;
+                VotingService.StartorStopRequest replyClient = VotingService.StartorStopRequest
+                        .newBuilder()
+                        .setState(request.getState())
+                        .setFirst(true)
+                        .setStartedCounter(startedCounter)
+                        .setStartOrStop(request.getStartOrStop())
+                        .build();
+                responseObserver.onNext(replyClient);
+                responseObserver.onCompleted();
                 service_start = request.getStartOrStop();
+                log.info("service is now started: {}" + service_start.toString());
             }
             else {
                 service_start = request.getStartOrStop();
@@ -305,9 +347,46 @@ import org.apache.zookeeper.*;
         }
 
 
+
+
         @Override
         public void electionResults(protos.VotingService.ResultsRequest request,
-                                    io.grpc.stub.StreamObserver<protos.VotingService.ResultsRequest> responseObserver){}
+                                    io.grpc.stub.StreamObserver<protos.VotingService.ResultsRequest> responseObserver){
+            ArrayList<voteCounter> voteCounters = new ArrayList<voteCounter>() ;
+            for (VoteInfo temp : votes.values()){
+                voteCounter it = new voteCounter(-1, -1);
+                for(voteCounter temp2 : voteCounters) {
+                    if((temp2.getCandidate() == temp.getCandidate())) {
+                        it = temp2;
+                        break;
+                    }
 
+                }
+                if( it.getCandidate() == -1 && it.getCounter() == -1 ){
+                    voteCounters.add((new voteCounter(temp.getCandidate(),0)));
+                }
+                else {
+                    it.increaseCounter();
+                }
+            }
+
+            int candidateWithMaxVotes = 0;
+            for (voteCounter temp : voteCounters) {
+                if(temp.getCounter() > candidateWithMaxVotes) {
+                    candidateWithMaxVotes = temp.getCandidate();
+                }
+            }
+
+            VotingService.ResultsRequest state_winner = VotingService.ResultsRequest
+                    .newBuilder()
+                    .setState(cluster_state_name)
+                    .setCandidate(candidateWithMaxVotes)
+                    .setElectors(request.getElectors())
+                    .build();
+
+            responseObserver.onNext(state_winner);
+            responseObserver.onCompleted();
+        }
 
 }
+

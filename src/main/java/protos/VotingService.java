@@ -29,36 +29,64 @@ public final class VotingService {
     int getVoterCandidate();
 
     /**
+     * <pre>
+     *&#47;/default = ""
+     * </pre>
+     *
      * <code>string time = 3;</code>
      */
     java.lang.String getTime();
     /**
+     * <pre>
+     *&#47;/default = ""
+     * </pre>
+     *
      * <code>string time = 3;</code>
      */
     com.google.protobuf.ByteString
         getTimeBytes();
 
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>bool leader_sent = 4;</code>
      */
     boolean getLeaderSent();
 
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>string accepted_by = 5;</code>
      */
     java.lang.String getAcceptedBy();
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>string accepted_by = 5;</code>
      */
     com.google.protobuf.ByteString
         getAcceptedByBytes();
 
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>bool vote_accepted = 6;</code>
      */
     boolean getVoteAccepted();
 
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>bool leader_done = 7;</code>
      */
     boolean getLeaderDone();
@@ -198,6 +226,10 @@ public final class VotingService {
     public static final int TIME_FIELD_NUMBER = 3;
     private volatile java.lang.Object time_;
     /**
+     * <pre>
+     *&#47;/default = ""
+     * </pre>
+     *
      * <code>string time = 3;</code>
      */
     public java.lang.String getTime() {
@@ -213,6 +245,10 @@ public final class VotingService {
       }
     }
     /**
+     * <pre>
+     *&#47;/default = ""
+     * </pre>
+     *
      * <code>string time = 3;</code>
      */
     public com.google.protobuf.ByteString
@@ -232,6 +268,10 @@ public final class VotingService {
     public static final int LEADER_SENT_FIELD_NUMBER = 4;
     private boolean leaderSent_;
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>bool leader_sent = 4;</code>
      */
     public boolean getLeaderSent() {
@@ -241,6 +281,10 @@ public final class VotingService {
     public static final int ACCEPTED_BY_FIELD_NUMBER = 5;
     private volatile java.lang.Object acceptedBy_;
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>string accepted_by = 5;</code>
      */
     public java.lang.String getAcceptedBy() {
@@ -256,6 +300,10 @@ public final class VotingService {
       }
     }
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>string accepted_by = 5;</code>
      */
     public com.google.protobuf.ByteString
@@ -275,6 +323,10 @@ public final class VotingService {
     public static final int VOTE_ACCEPTED_FIELD_NUMBER = 6;
     private boolean voteAccepted_;
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>bool vote_accepted = 6;</code>
      */
     public boolean getVoteAccepted() {
@@ -284,6 +336,10 @@ public final class VotingService {
     public static final int LEADER_DONE_FIELD_NUMBER = 7;
     private boolean leaderDone_;
     /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
      * <code>bool leader_done = 7;</code>
      */
     public boolean getLeaderDone() {
@@ -732,6 +788,10 @@ public final class VotingService {
 
       private java.lang.Object time_ = "";
       /**
+       * <pre>
+       *&#47;/default = ""
+       * </pre>
+       *
        * <code>string time = 3;</code>
        */
       public java.lang.String getTime() {
@@ -747,6 +807,10 @@ public final class VotingService {
         }
       }
       /**
+       * <pre>
+       *&#47;/default = ""
+       * </pre>
+       *
        * <code>string time = 3;</code>
        */
       public com.google.protobuf.ByteString
@@ -763,6 +827,10 @@ public final class VotingService {
         }
       }
       /**
+       * <pre>
+       *&#47;/default = ""
+       * </pre>
+       *
        * <code>string time = 3;</code>
        */
       public Builder setTime(
@@ -776,6 +844,10 @@ public final class VotingService {
         return this;
       }
       /**
+       * <pre>
+       *&#47;/default = ""
+       * </pre>
+       *
        * <code>string time = 3;</code>
        */
       public Builder clearTime() {
@@ -785,6 +857,10 @@ public final class VotingService {
         return this;
       }
       /**
+       * <pre>
+       *&#47;/default = ""
+       * </pre>
+       *
        * <code>string time = 3;</code>
        */
       public Builder setTimeBytes(
@@ -801,12 +877,20 @@ public final class VotingService {
 
       private boolean leaderSent_ ;
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool leader_sent = 4;</code>
        */
       public boolean getLeaderSent() {
         return leaderSent_;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool leader_sent = 4;</code>
        */
       public Builder setLeaderSent(boolean value) {
@@ -816,6 +900,10 @@ public final class VotingService {
         return this;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool leader_sent = 4;</code>
        */
       public Builder clearLeaderSent() {
@@ -827,6 +915,10 @@ public final class VotingService {
 
       private java.lang.Object acceptedBy_ = "";
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>string accepted_by = 5;</code>
        */
       public java.lang.String getAcceptedBy() {
@@ -842,6 +934,10 @@ public final class VotingService {
         }
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>string accepted_by = 5;</code>
        */
       public com.google.protobuf.ByteString
@@ -858,6 +954,10 @@ public final class VotingService {
         }
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>string accepted_by = 5;</code>
        */
       public Builder setAcceptedBy(
@@ -871,6 +971,10 @@ public final class VotingService {
         return this;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>string accepted_by = 5;</code>
        */
       public Builder clearAcceptedBy() {
@@ -880,6 +984,10 @@ public final class VotingService {
         return this;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>string accepted_by = 5;</code>
        */
       public Builder setAcceptedByBytes(
@@ -896,12 +1004,20 @@ public final class VotingService {
 
       private boolean voteAccepted_ ;
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool vote_accepted = 6;</code>
        */
       public boolean getVoteAccepted() {
         return voteAccepted_;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool vote_accepted = 6;</code>
        */
       public Builder setVoteAccepted(boolean value) {
@@ -911,6 +1027,10 @@ public final class VotingService {
         return this;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool vote_accepted = 6;</code>
        */
       public Builder clearVoteAccepted() {
@@ -922,12 +1042,20 @@ public final class VotingService {
 
       private boolean leaderDone_ ;
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool leader_done = 7;</code>
        */
       public boolean getLeaderDone() {
         return leaderDone_;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool leader_done = 7;</code>
        */
       public Builder setLeaderDone(boolean value) {
@@ -937,6 +1065,10 @@ public final class VotingService {
         return this;
       }
       /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
        * <code>bool leader_done = 7;</code>
        */
       public Builder clearLeaderDone() {
