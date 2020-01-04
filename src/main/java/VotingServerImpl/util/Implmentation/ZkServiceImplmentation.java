@@ -4,6 +4,7 @@ import VotingServerImpl.util.ClusterData;
 import VotingServerImpl.util.StringSerializer;
 import VotingServerImpl.util.ZkServiceAPI;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -55,12 +56,17 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
 
     @Override
     public List<String> getLiveNodes(String state) {
-        //state = state + "/";
-        if (!zkClient.exists(ClusterData.MEMBERSHIP_APP + state)) {
-            throw new RuntimeException("No node /liveNodes exists");
+        if(!state.equals("")) {
+            if (!zkClient.exists(ClusterData.MEMBERSHIP_APP + "/" + state)) {
+                throw new RuntimeException("No node /liveNodes exists");
+            }
         }
-
-        return zkClient.getChildren(ClusterData.MEMBERSHIP_APP);
+        if(state.equals("")) {
+            return zkClient.getChildren(ClusterData.MEMBERSHIP_APP);
+        }
+        else {
+            return zkClient.getChildren(ClusterData.MEMBERSHIP_APP + "/" + state);
+        }
     }
 
 

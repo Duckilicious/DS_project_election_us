@@ -1,7 +1,9 @@
 package RESTredirectionService.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
+import ch.qos.logback.classic.util.ContextSelectorStaticBinder;
 
 @Data
 public class Vote {
@@ -29,43 +31,4 @@ public class Vote {
         this.candidate = candidate;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getNational_security_number() {
-        return national_security_number;
-    }
-
-    public void setNational_security_number(int national_security_number) {
-        this.national_security_number = national_security_number;
-    }
-
-    public String getFirst_name() {
-        return first_name;
-    }
-
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
-    }
-
-    public String getLast_name() {
-        return last_name;
-    }
-
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
-    }
-
-    public String getCandidate() {
-        return candidate;
-    }
-
-    public void setCandidate(String candidate) {
-        this.candidate = candidate;
-    }
 }

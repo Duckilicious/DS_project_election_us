@@ -296,7 +296,7 @@ import java.util.*;
         @Override
         public void startorStopState(protos.VotingService.StartorStopRequest request,
                                io.grpc.stub.StreamObserver<protos.VotingService.StartorStopRequest> responseObserver) {
-
+            log.info("Received a startOrStop call");
             if (request.getFirst()) {
                 List<String> nodes = zkServiceAPI.getLiveNodes(request.getState());
                 nodes.remove(HostName);
@@ -312,22 +312,25 @@ import java.util.*;
                             .setStartedCounter(0)
                             .setStartOrStop(request.getStartOrStop())
                             .build();
+                    log.info("sending request to:" + temp);
                     VotingService.StartorStopRequest reply = Stub.stub.startorStopState(startOthers);
                     if (reply.getStartedCounter() == 1) {
                         startedCounter++;
                     }
 
-                    VotingService.StartorStopRequest replyClient = VotingService.StartorStopRequest
-                            .newBuilder()
-                            .setState(request.getState())
-                            .setFirst(false)
-                            .setStartedCounter(startedCounter)
-                            .setStartOrStop(request.getStartOrStop())
-                            .build();
-                    responseObserver.onNext(replyClient);
-                    responseObserver.onCompleted();
                 }
+                startedCounter++;
+                VotingService.StartorStopRequest replyClient = VotingService.StartorStopRequest
+                        .newBuilder()
+                        .setState(request.getState())
+                        .setFirst(true)
+                        .setStartedCounter(startedCounter)
+                        .setStartOrStop(request.getStartOrStop())
+                        .build();
+                responseObserver.onNext(replyClient);
+                responseObserver.onCompleted();
                 service_start = request.getStartOrStop();
+                log.info("service is now started: {}" + service_start.toString());
             }
             else {
                 service_start = request.getStartOrStop();
