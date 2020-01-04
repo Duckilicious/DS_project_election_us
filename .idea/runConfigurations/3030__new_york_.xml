@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="3030 &quot;new_york&quot;" type="Application" factoryName="Application" singleton="false">
+    <option name="MAIN_CLASS_NAME" value="VotingServerImpl.VoteServerStart" />
+    <module name="DS" />
+    <option name="PROGRAM_PARAMETERS" value="3030 localhost:5050 &quot;new_york&quot;" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="VotingServerImpl.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

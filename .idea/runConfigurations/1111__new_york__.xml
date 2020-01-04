@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="1111 &quot;new_york&quot; " type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="VotingServerImpl.VoteServerStart" />
+    <module name="DS" />
+    <option name="PROGRAM_PARAMETERS" value="1111 localhost:5050 &quot;new_york&quot;" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

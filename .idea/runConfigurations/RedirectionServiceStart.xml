@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RedirectionServiceStart" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="DS" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="RESTredirectionService.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="RESTredirectionService.RedirectionServiceStart" />
+    <option name="VM_PARAMETERS" value="-Dserver.port=9090" />
+    <option name="PROGRAM_PARAMETERS" value="localhost:5050" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
