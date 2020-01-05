@@ -3,6 +3,7 @@ package RESTredirectionService.controllers;
 import RESTredirectionService.VoteError.VoteException;
 import RESTredirectionService.models.Vote;
 import VotingServerImpl.GrpcServer.VotingServerStubs;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import protos.VotingService;
 
@@ -14,9 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static RESTredirectionService.RedirectionServiceStart.zkservice;
 
-
+@Slf4j
 @RestController
 @RequestMapping
+
 public class VoteController {
     private HashMap<Integer, Vote> votes =
             new HashMap<>();
@@ -25,9 +27,8 @@ public class VoteController {
 
     VoteController() {
         votes.put(eid.getAndIncrement(), new
-                Vote(1,1234567890,"Tal","Gelbard",20,"New York"));
-        votes.put(eid.getAndIncrement(), new
-                Vote(2,545678,"Raz","Rippa",20,"Los Angels"));
+                Vote(1234567890,20,"new_york"));
+
     }
 
     @GetMapping("/votes")
@@ -53,11 +54,14 @@ public class VoteController {
         int i = rand.nextInt(size);
         String live_node = zkservice.getLiveNodes(newVote.getState()).get(i);
         String[] parts = live_node.split(":");
-        VotingServerImpl.GrpcServer.VotingServerStubs stub = new VotingServerStubs(parts[0],Integer.parseInt(parts[1]));
-        protos.VotingService.VoteRequest reply = stub.stub.vote(vote);
-        if(!reply.getVoteAccepted()){
-            throw new VoteException();
-        }
+
+            VotingServerImpl.GrpcServer.VotingServerStubs stub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
+            protos.VotingService.VoteRequest reply = stub.stub.vote(vote);
+            if (!reply.getVoteAccepted()) {
+                log.error("Vote wasn't accepted user should get HTTP 500");
+                throw new VoteException();
+            }
+
         votes.put(eid.getAndIncrement(), newVote);
         return newVote;
     }

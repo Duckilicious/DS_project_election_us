@@ -211,23 +211,33 @@ import java.util.*;
             else {
                 String leader = zkServiceAPI.getLeaderNodeData(cluster_state_name);
                 String[] parts = leader.split(":");
-                VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
+
                 log.info("Sent to leader to create total order");
-                VotingService.VoteRequest respond = leaderStub.stub.vote(request);
 
-
-                if(respond.getLeaderDone()) {
-                    try {
-                        responseObserver.onNext(request);
-                        responseObserver.onCompleted();
-                        log.info("Sending back info to REST server");
+                try {
+                    VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
+                    VotingService.VoteRequest respond = leaderStub.stub.vote(request);
+                    if(respond.getLeaderDone()) {
+                        try {
+                            responseObserver.onNext(request);
+                            responseObserver.onCompleted();
+                            log.info("Sending back info to REST server");
+                        }
+                        catch (Exception e) {
+                            log.error("REST server wasn't able to accept ack, rolling back vote");
+                            List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
+                            stubs = updateAlive(alive_nodes);
+                            rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
+                        }
                     }
-                    catch (Exception e) {
-                        log.error("REST server wasn't able to accept ack, rolling back vote");
-                        List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
-                        stubs = updateAlive(alive_nodes);
-                        rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
-                    }
+                }
+                catch (Exception e){
+                    log.error("Leader unavailable failing the vote");
+                    VotingService.VoteRequest respond = VotingService.VoteRequest.newBuilder()
+                            .setVoteAccepted(false)
+                            .build();
+                    responseObserver.onNext(respond);
+                    responseObserver.onCompleted();
                 }
             }
             }

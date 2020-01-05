@@ -7,10 +7,13 @@ import org.apache.log4j.BasicConfigurator;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import static java.lang.System.exit;
 
-
+@Configuration
 @SpringBootApplication
 public class RedirectionServiceStart {
 	public static ZkServiceImplmentation zkservice;

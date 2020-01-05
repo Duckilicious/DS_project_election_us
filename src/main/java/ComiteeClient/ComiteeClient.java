@@ -130,7 +130,7 @@ public class ComiteeClient {
                 statesInCluster = starorStopOneCluster(temp, startOrStop);
             }
             catch (Exception e) {
-                log.error("No alive nodes in cluster" + temp);
+                log.error("No alive nodes in cluster " + temp);
                 continue;
             }
             if(startOrStop)
