@@ -10,9 +10,14 @@ import org.slf4j.LoggerFactory;
 import protos.VotingService;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.lang.System.exit;
 
 
 @Slf4j
@@ -29,8 +34,6 @@ public class ComiteeClient {
         List<String> states = zkServiceAPI.getLiveNodes("");
         stateList = new ArrayList<>();
         stateList.addAll(states);
-
-        log.info("Gracefully disconnect from Zookeeper");
     }
 
     private void fillStateElectors() {
@@ -208,31 +211,58 @@ public class ComiteeClient {
     public static void main(String[] args) {
         if(args.length == 0){
             System.out.println("Missing Zookeeper host");
-            System.exit(0);
+            exit(0);
         }
 
         BasicConfigurator.configure();
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
         ComiteeClient client = new ComiteeClient(args[0]);
-          switch (args[1])
-          {
-              case "start_all" :
-                  client.startorStopAll(true);
-                  break;
+        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        String commandLine;
+        while(true) {
+            System.out.print("ComiteeShell >" );
+            try {
+                commandLine = console.readLine();
+            }
+            catch (IOException e){
+                System.out.print("Bad Input");
+                continue;
+            }
+            switch (commandLine) {
+                case "start_all":
+                    client.startorStopAll(true);
+                    break;
 
-              case "stop_all" :
-                  client.startorStopAll(false);
-                  break;
+                case "":
+                    continue;
 
-              case "get_results" :
-                  client.electionResults();
-                  break;
-              case "vote" :
-                  client.vote(3, 1, "new_york");
-              default:
-                  System.out.print(args[1] + "Command not recognized");
-          }
-        client.zkServiceAPI.closeConnection();
+                case "help":
+                    System.out.print("start_all - starts all clusters \n" +
+                            "stop_all - stops all clusters \n" +
+                            "exit - exit client \n" +
+                            "get_results - get election results"
+                    );
+
+                case "stop_all":
+                    client.startorStopAll(false);
+                    break;
+
+                case "exit":
+                    client.zkServiceAPI.closeConnection();
+                    log.info("Gracefully disconnect from Zookeeper");
+                    exit(0);
+                    break;
+
+
+                case "get_results":
+                    client.electionResults();
+                    break;
+                case "vote":
+                    client.vote(3, 1, "new_york");
+                default:
+                    System.out.print(commandLine + "Command not recognized");
+            }
+        }
     }
 }
