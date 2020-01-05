@@ -1,8 +1,8 @@
 package RESTredirectionService.controllers;
 
+import RESTredirectionService.VoteError.VoteException;
 import RESTredirectionService.models.Vote;
 import VotingServerImpl.GrpcServer.VotingServerStubs;
-import VotingServerImpl.util.ClusterData;
 import org.springframework.web.bind.annotation.*;
 import protos.VotingService;
 
@@ -40,6 +40,8 @@ public class VoteController {
         return votes.get(id);
     }
 
+
+
     @PostMapping("/votes")
     Vote newVote(@RequestBody Vote newVote) {
         VotingService.VoteRequest vote = VotingService.VoteRequest
@@ -54,7 +56,7 @@ public class VoteController {
         VotingServerImpl.GrpcServer.VotingServerStubs stub = new VotingServerStubs(parts[0],Integer.parseInt(parts[1]));
         protos.VotingService.VoteRequest reply = stub.stub.vote(vote);
         if(!reply.getVoteAccepted()){
-
+            throw new VoteException();
         }
         votes.put(eid.getAndIncrement(), newVote);
         return newVote;
