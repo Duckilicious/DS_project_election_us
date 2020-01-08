@@ -1154,6 +1154,15 @@ public final class VotingService {
      * <code>bool start_or_stop = 4;</code>
      */
     boolean getStartOrStop();
+
+    /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
+     * <code>bool success = 5;</code>
+     */
+    boolean getSuccess();
   }
   /**
    * Protobuf type {@code protos.StartorStopRequest}
@@ -1172,6 +1181,7 @@ public final class VotingService {
       startedCounter_ = 0;
       first_ = false;
       startOrStop_ = false;
+      success_ = false;
     }
 
     @java.lang.Override
@@ -1224,6 +1234,11 @@ public final class VotingService {
             case 32: {
 
               startOrStop_ = input.readBool();
+              break;
+            }
+            case 40: {
+
+              success_ = input.readBool();
               break;
             }
           }
@@ -1311,6 +1326,19 @@ public final class VotingService {
       return startOrStop_;
     }
 
+    public static final int SUCCESS_FIELD_NUMBER = 5;
+    private boolean success_;
+    /**
+     * <pre>
+     *default = false
+     * </pre>
+     *
+     * <code>bool success = 5;</code>
+     */
+    public boolean getSuccess() {
+      return success_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1335,6 +1363,9 @@ public final class VotingService {
       if (startOrStop_ != false) {
         output.writeBool(4, startOrStop_);
       }
+      if (success_ != false) {
+        output.writeBool(5, success_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1357,6 +1388,10 @@ public final class VotingService {
       if (startOrStop_ != false) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(4, startOrStop_);
+      }
+      if (success_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, success_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1382,6 +1417,8 @@ public final class VotingService {
           == other.getFirst());
       result = result && (getStartOrStop()
           == other.getStartOrStop());
+      result = result && (getSuccess()
+          == other.getSuccess());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1403,6 +1440,9 @@ public final class VotingService {
       hash = (37 * hash) + START_OR_STOP_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getStartOrStop());
+      hash = (37 * hash) + SUCCESS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getSuccess());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1540,6 +1580,8 @@ public final class VotingService {
 
         startOrStop_ = false;
 
+        success_ = false;
+
         return this;
       }
 
@@ -1566,6 +1608,7 @@ public final class VotingService {
         result.startedCounter_ = startedCounter_;
         result.first_ = first_;
         result.startOrStop_ = startOrStop_;
+        result.success_ = success_;
         onBuilt();
         return result;
       }
@@ -1619,6 +1662,9 @@ public final class VotingService {
         }
         if (other.getStartOrStop() != false) {
           setStartOrStop(other.getStartOrStop());
+        }
+        if (other.getSuccess() != false) {
+          setSuccess(other.getSuccess());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1790,6 +1836,44 @@ public final class VotingService {
       public Builder clearStartOrStop() {
         
         startOrStop_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean success_ ;
+      /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
+       * <code>bool success = 5;</code>
+       */
+      public boolean getSuccess() {
+        return success_;
+      }
+      /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
+       * <code>bool success = 5;</code>
+       */
+      public Builder setSuccess(boolean value) {
+        
+        success_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *default = false
+       * </pre>
+       *
+       * <code>bool success = 5;</code>
+       */
+      public Builder clearSuccess() {
+        
+        success_ = false;
         onChanged();
         return this;
       }
@@ -3241,21 +3325,21 @@ public final class VotingService {
       "equest\022\020\n\010voter_id\030\001 \001(\005\022\027\n\017voter_candid" +
       "ate\030\002 \001(\005\022\014\n\004time\030\003 \001(\t\022\023\n\013leader_sent\030\004" +
       " \001(\010\022\023\n\013accepted_by\030\005 \001(\t\022\025\n\rvote_accept" +
-      "ed\030\006 \001(\010\022\023\n\013leader_done\030\007 \001(\010\"b\n\022Startor" +
+      "ed\030\006 \001(\010\022\023\n\013leader_done\030\007 \001(\010\"s\n\022Startor" +
       "StopRequest\022\r\n\005state\030\001 \001(\t\022\027\n\017started_co" +
       "unter\030\002 \001(\005\022\r\n\005first\030\003 \001(\010\022\025\n\rstart_or_s" +
-      "top\030\004 \001(\010\"D\n\016ResultsRequest\022\r\n\005state\030\001 \001" +
-      "(\t\022\021\n\tcandidate\030\002 \001(\005\022\020\n\010electors\030\003 \001(\005\"" +
-      "a\n\nVoteDelete\022\020\n\010voter_id\030\001 \001(\005\022\024\n\014previ" +
-      "ousVote\030\002 \001(\005\022\024\n\014previousTime\030\003 \001(\t\022\025\n\rd" +
-      "eleteSuccess\030\004 \001(\0102\214\002\n\013VoteService\0222\n\004Vo" +
-      "te\022\023.protos.VoteRequest\032\023.protos.VoteReq" +
-      "uest\"\000\022L\n\020StartorStopState\022\032.protos.Star" +
-      "torStopRequest\032\032.protos.StartorStopReque" +
-      "st\"\000\0226\n\nDeleteVote\022\022.protos.VoteDelete\032\022" +
-      ".protos.VoteDelete\"\000\022C\n\017ElectionResults\022" +
-      "\026.protos.ResultsRequest\032\026.protos.Results" +
-      "Request\"\000b\006proto3"
+      "top\030\004 \001(\010\022\017\n\007success\030\005 \001(\010\"D\n\016ResultsReq" +
+      "uest\022\r\n\005state\030\001 \001(\t\022\021\n\tcandidate\030\002 \001(\005\022\020" +
+      "\n\010electors\030\003 \001(\005\"a\n\nVoteDelete\022\020\n\010voter_" +
+      "id\030\001 \001(\005\022\024\n\014previousVote\030\002 \001(\005\022\024\n\014previo" +
+      "usTime\030\003 \001(\t\022\025\n\rdeleteSuccess\030\004 \001(\0102\214\002\n\013" +
+      "VoteService\0222\n\004Vote\022\023.protos.VoteRequest" +
+      "\032\023.protos.VoteRequest\"\000\022L\n\020StartorStopSt" +
+      "ate\022\032.protos.StartorStopRequest\032\032.protos" +
+      ".StartorStopRequest\"\000\0226\n\nDeleteVote\022\022.pr" +
+      "otos.VoteDelete\032\022.protos.VoteDelete\"\000\022C\n" +
+      "\017ElectionResults\022\026.protos.ResultsRequest" +
+      "\032\026.protos.ResultsRequest\"\000b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3280,7 +3364,7 @@ public final class VotingService {
     internal_static_protos_StartorStopRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_protos_StartorStopRequest_descriptor,
-        new java.lang.String[] { "State", "StartedCounter", "First", "StartOrStop", });
+        new java.lang.String[] { "State", "StartedCounter", "First", "StartOrStop", "Success", });
     internal_static_protos_ResultsRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_protos_ResultsRequest_fieldAccessorTable = new

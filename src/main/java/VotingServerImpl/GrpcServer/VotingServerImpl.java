@@ -25,12 +25,14 @@ import java.util.*;
         private ZkServiceImplmentation zkServiceAPI;
         private String cluster_state_name;
         private Boolean service_start;
+        private Boolean service_integrity;
         private ArrayList<VotingServerStubs> stubs;
         private HashMap<Integer, VoteInfo> votes;
 
         public VotingServerImpl(String port, String hostList, String state) {
             cluster_state_name = state;
             service_start = false;
+            ClusterData.ZKhost_list = hostList;
             stubs = new ArrayList<VotingServerStubs>();
             votes = new HashMap<>(0);
             int portNum = Integer.parseInt(port);
@@ -62,10 +64,10 @@ import java.util.*;
                 zkServiceAPI.addToLiveNodes(HostIP.getIp()+":" + port, HostIP.getIp()+":" + port , state);
                 log.info("Joined membership app for the state");
 
-                zkServiceAPI.registerChildrenChangeWatcher(ClusterData.LEADER_ELECTION, new MasterChangeListener());
+                zkServiceAPI.registerChildrenChangeWatcher(ClusterData.LEADER_ELECTION + "/"  + state, new MasterChangeListener());
                 log.info("add permneant watcher for election");
 
-                zkServiceAPI.registerChildrenChangeWatcher(ClusterData.MEMBERSHIP_APP, new MembershipListener());
+                zkServiceAPI.registerChildrenChangeWatcher(ClusterData.MEMBERSHIP_APP + "/" + state , new MembershipListener());
                 log.info("add permneant watcher for membership");
 
                 log.info("Host startup done" + HostName);
@@ -86,6 +88,11 @@ import java.util.*;
             }
             catch (Exception e){
                 throw new RuntimeException("server start failed", e);
+            }
+        }
+        public void blockUntilShutdown() throws InterruptedException {
+            if (VoteServer != null) {
+                VoteServer.awaitTermination();
             }
         }
 
@@ -135,9 +142,13 @@ import java.util.*;
             //
             log.info("Leader set time for vote, total order was established");
             for (VotingServerStubs temp : stubs) {
-                protos.VotingService.VoteRequest reply = temp.stub.vote(newRequest);
-                if(reply.getVoteAccepted()) {
-                    counter ++;
+                try {
+                    protos.VotingService.VoteRequest reply = temp.stub.vote(newRequest);
+                    if (reply.getVoteAccepted())
+                        counter++;
+                }
+                catch (Exception e) {
+                   log.info("Leader wasn't able to communicate with all the cluster, rollback will be performed");
                 }
             }
             //every alive member updated updated
@@ -252,15 +263,21 @@ import java.util.*;
             VoteInfo info = (votes.get(request.getVoterId()));
             if (info != null) {
                 for (VotingServerStubs temp : stubs) {
-                    VotingService.VoteDelete recent = VotingService.VoteDelete.newBuilder()
-                            .setVoterId(info.getVoterID())
-                            .setPreviousVote(info.getCandidate())
-                            .setPreviousTime(info.getTime().toString())
-                            .setDeleteSuccess(false)
-                            .build();
-                    VotingService.VoteDelete reply = temp.stub.deleteVote(recent);
-                    if (reply.getDeleteSuccess()) {
-                        counter_delete++;
+                    try {
+                        VotingService.VoteDelete recent = VotingService.VoteDelete.newBuilder()
+                                .setVoterId(info.getVoterID())
+                                .setPreviousVote(info.getCandidate())
+                                .setPreviousTime(info.getTime().toString())
+                                .setDeleteSuccess(false)
+                                .build();
+                        VotingService.VoteDelete reply = temp.stub.deleteVote(recent);
+                        if (reply.getDeleteSuccess()) {
+                            counter_delete++;
+                        }
+                    }
+                    catch (Exception e){
+                        log.error("Could be that server" + temp.Host + Integer.toString(temp.Port) + "data is incossitent");
+                        //TODO kill that server
                     }
                 }
                 log.info("Rollbacked {} servers", counter_delete);
@@ -307,8 +324,14 @@ import java.util.*;
                     .setDeleteSuccess(true)
                     .build();
 
-            responseObserver.onNext(reply);
-            responseObserver.onCompleted();
+            try {
+                responseObserver.onNext(reply);
+                responseObserver.onCompleted();
+            }
+            catch (Exception e) {
+                log.error("The server data was consistent, but this server won't be trusted");
+                service_integrity = false;
+            }
         }
 
         @Override
@@ -321,21 +344,35 @@ import java.util.*;
                 int startedCounter = 0;
 
                 for (String temp : nodes) {
-                    String[] parts = temp.split(":");
-                    VotingServerStubs Stub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
-                    VotingService.StartorStopRequest startOthers = VotingService.StartorStopRequest
-                            .newBuilder()
-                            .setState(request.getState())
-                            .setFirst(false)
-                            .setStartedCounter(0)
-                            .setStartOrStop(request.getStartOrStop())
-                            .build();
-                    log.info("sending request to:" + temp);
-                    VotingService.StartorStopRequest reply = Stub.stub.startorStopState(startOthers);
-                    if (reply.getStartedCounter() == 1) {
-                        startedCounter++;
-                    }
+                    try {
+                        String[] parts = temp.split(":");
+                        VotingServerStubs Stub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
+                        VotingService.StartorStopRequest startOthers = VotingService.StartorStopRequest
+                                .newBuilder()
+                                .setState(request.getState())
+                                .setFirst(false)
+                                .setStartedCounter(0)
+                                .setStartOrStop(request.getStartOrStop())
+                                .build();
+                        log.info("sending request to:" + temp);
+                        VotingService.StartorStopRequest reply = Stub.stub.startorStopState(startOthers);
+                        if (reply.getStartedCounter() == 1) {
+                            startedCounter++;
+                        }
 
+                    }
+                    catch (Exception e) {
+                        VotingService.StartorStopRequest replyClient = VotingService.StartorStopRequest
+                                .newBuilder()
+                                .setState(request.getState())
+                                .setFirst(true)
+                                .setStartedCounter(startedCounter)
+                                .setStartOrStop(request.getStartOrStop())
+                                .setSuccess(false)
+                                .build();
+                        responseObserver.onNext(replyClient);
+                        responseObserver.onCompleted();
+                    }
                 }
                 startedCounter++;
                 VotingService.StartorStopRequest replyClient = VotingService.StartorStopRequest
@@ -343,15 +380,18 @@ import java.util.*;
                         .setState(request.getState())
                         .setFirst(true)
                         .setStartedCounter(startedCounter)
+                        .setSuccess(true)
                         .setStartOrStop(request.getStartOrStop())
                         .build();
                 responseObserver.onNext(replyClient);
                 responseObserver.onCompleted();
                 service_start = request.getStartOrStop();
+                service_integrity = true;
                 log.info("service is now started: {}" + service_start.toString());
             }
             else {
                 service_start = request.getStartOrStop();
+                service_integrity = true;
                 VotingService.StartorStopRequest sendToFirst = VotingService.StartorStopRequest
                         .newBuilder()
                         .setState(request.getState())

@@ -34,6 +34,7 @@ public class ComiteeClient {
         List<String> states = zkServiceAPI.getLiveNodes("");
         stateList = new ArrayList<>();
         stateList.addAll(states);
+        log.info("finished starting client");
     }
 
     private void fillStateElectors() {
@@ -41,6 +42,7 @@ public class ComiteeClient {
         StateElectors.put("albama", 9);
         StateElectors.put("alska", 3);
         StateElectors.put("arkansas", 6);
+        StateElectors.put("arizona", 11);
         StateElectors.put("california", 55);
         StateElectors.put("colorado", 9);
         StateElectors.put("conneticut", 7);
@@ -109,6 +111,8 @@ public class ComiteeClient {
         try {
             VotingService.StartorStopRequest respond = stub.stub.startorStopState(start);
             stub.shutdown();
+            if(!respond.getSuccess())
+                log.error("Couldn't start or stop cluster correctly, please try again");
             return respond.getStartedCounter();
         }
         catch (Exception e){
@@ -156,7 +160,7 @@ public class ComiteeClient {
 
     public void electionResults() {
         int[]  results = new int[50];
-        int winningStateCandidate;
+        int winningStateCandidate = 0;
         int winner = 0;
 
         for(String temp : stateList) {
@@ -168,7 +172,12 @@ public class ComiteeClient {
                 log.error("No alive nodes in cluster" + temp);
                 continue;
             }
-            results[winningStateCandidate] += StateElectors.get(temp);
+            try {
+                results[winningStateCandidate] += StateElectors.get(temp);
+            }
+            catch (NullPointerException e) {
+                log.error("No state by that name");
+            }
         }
 
         for(int i = 0; i < 50; i ++) {
@@ -241,8 +250,9 @@ public class ComiteeClient {
                     System.out.print("start_all - starts all clusters \n" +
                             "stop_all - stops all clusters \n" +
                             "exit - exit client \n" +
-                            "get_results - get election results"
+                            "get_results - get election results \n"
                     );
+                    break;
 
                 case "stop_all":
                     client.startorStopAll(false);
@@ -253,7 +263,6 @@ public class ComiteeClient {
                     log.info("Gracefully disconnect from Zookeeper");
                     exit(0);
                     break;
-
 
                 case "get_results":
                     client.electionResults();

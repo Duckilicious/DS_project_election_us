@@ -18,8 +18,8 @@ public class VoteServerStart {
             if(args.length == 3) {
                 VotingServerImpl mainServer = new VotingServerImpl(args[0], args[1], args[2]);
                 mainServer.start();
-                log.info("Server started listening on port {}", args[0]);
-                while(true);
+                log.info("Server started listening on port {} ", args[0]);
+                mainServer.blockUntilShutdown();
             }
             else {
                 throw new RuntimeException("Not enough argmuents");

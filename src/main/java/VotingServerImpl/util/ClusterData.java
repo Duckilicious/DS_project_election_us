@@ -12,6 +12,8 @@ public class ClusterData {
     public static final String LEADER_ELECTION = "/leader_election_app";
     public static final String MEMBERSHIP_APP = "/membership_app";
 
+    public static String ZKhost_list;
+
     private static ClusterData clusterdata = new ClusterData();
 
     public static ClusterData getClusterInfo(){

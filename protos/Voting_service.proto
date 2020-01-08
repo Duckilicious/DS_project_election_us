@@ -16,6 +16,7 @@ message StartorStopRequest {
     int32 started_counter = 2;
     bool first = 3;
     bool start_or_stop = 4;
+    bool success = 5; //default = false
 }
 
 
