@@ -59,7 +59,7 @@ public class VoteController {
             protos.VotingService.VoteRequest reply = stub.stub.vote(vote);
             if (!reply.getVoteAccepted()) {
                 log.error("Vote wasn't accepted user should get HTTP 500");
-                throw new VoteException();
+                throw new VoteException("500", "System error):");
             }
 
         votes.put(eid.getAndIncrement(), newVote);
