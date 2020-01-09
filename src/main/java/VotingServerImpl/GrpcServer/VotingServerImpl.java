@@ -30,7 +30,6 @@ import java.util.*;
         public static ZkServiceImplmentation zkServiceAPI;
         private String cluster_state_name;
         private Boolean service_start;
-        private Boolean service_integrity;
         private ArrayList<VotingServerStubs> stubs;
         private HashMap<Integer, VoteInfo> votes;
 
@@ -249,7 +248,7 @@ import java.util.*;
                     leaderStub.channel.shutdown();
                     if(respond.getLeaderDone()) {
                         try {
-                            responseObserver.onNext(request);
+                            responseObserver.onNext(respond);
                             responseObserver.onCompleted();
                             log.info("Sending back info to REST server");
                         }
@@ -352,7 +351,6 @@ import java.util.*;
             }
             catch (Exception e) {
                 log.error("The server data was consistent, but this server won't be trusted");
-                service_integrity = false;
             }
         }
 
@@ -409,12 +407,10 @@ import java.util.*;
                 responseObserver.onNext(replyClient);
                 responseObserver.onCompleted();
                 service_start = request.getStartOrStop();
-                service_integrity = true;
                 log.info("service is now started: {}" + service_start.toString());
             }
             else {
                 service_start = request.getStartOrStop();
-                service_integrity = true;
                 VotingService.StartorStopRequest sendToFirst = VotingService.StartorStopRequest
                         .newBuilder()
                         .setState(request.getState())

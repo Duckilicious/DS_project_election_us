@@ -4,8 +4,11 @@ import RESTredirectionService.VoteError.VoteException;
 import RESTredirectionService.models.Vote;
 import VotingServerImpl.GrpcServer.VotingServerStubs;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import protos.VotingService;
+import RESTredirectionService.Error.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +33,8 @@ public class VoteController {
                 Vote(1234567890,20,"new_york"));
 
     }
-
-    @GetMapping("/votes")
+/** for testing **/
+    /*@GetMapping("/votes")
     List<Vote> all() {
         //System.out.print("abcd");
         return new ArrayList<>(votes.values());
@@ -40,11 +43,11 @@ public class VoteController {
     Vote one(@PathVariable int id) {
         return votes.get(id);
     }
-
+/**                   **/
 
 
     @PostMapping("/votes")
-    Vote newVote(@RequestBody Vote newVote) {
+    void newVote(@RequestBody Vote newVote) {
         VotingService.VoteRequest vote = VotingService.VoteRequest
                 .newBuilder()
                 .setVoterId(newVote.getNational_security_number())
@@ -59,11 +62,10 @@ public class VoteController {
             protos.VotingService.VoteRequest reply = stub.stub.vote(vote);
             if (!reply.getVoteAccepted()) {
                 log.error("Vote wasn't accepted user should get HTTP 500");
-                throw new VoteException("500", "System error):");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Please try to vote at a later time");
             }
-
-        votes.put(eid.getAndIncrement(), newVote);
-        return newVote;
+                log.info("Vote accpeted by {}" + Integer.toString(vote.getVoterId()));
+                throw new ResponseStatusException(HttpStatus.OK ,"Thanks for Voting");
     }
 }
 
