@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="4444 &quot;arizona&quot;  (1)" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="VotingServerImpl.VoteServerStart" />
+  <configuration default="false" name="4444 &quot;arizona&quot; " type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="VotingServerImpl.GrpcServer.VotingServerImpl" />
     <module name="DS" />
     <option name="PROGRAM_PARAMETERS" value="4444 localhost:5050 &quot;arizona&quot;" />
     <method v="2">

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="1515 &quot;new_york&quot;" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="VotingServerImpl.VoteServerStart" />
+    <option name="MAIN_CLASS_NAME" value="VotingServerImpl.GrpcServer.VotingServerImpl" />
     <module name="DS" />
     <option name="PROGRAM_PARAMETERS" value="1515 localhost:5050 &quot;new_york&quot;" />
     <method v="2">

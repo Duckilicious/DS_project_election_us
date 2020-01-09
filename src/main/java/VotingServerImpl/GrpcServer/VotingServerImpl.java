@@ -7,9 +7,14 @@ import VotingServerImpl.util.ClusterData;
 import VotingServerImpl.util.HostIP;
 import VotingServerImpl.util.Implmentation.ZkServiceImplmentation;
 import VotingServerImpl.util.VoteInfo;
+import VotingServerImpl.util.ZkServiceAPI;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.log4j.BasicConfigurator;
+import org.slf4j.LoggerFactory;
 import protos.VoteServiceGrpc;
 import protos.VotingService;
 
@@ -22,7 +27,7 @@ import java.util.*;
     public class VotingServerImpl extends VoteServiceGrpc.VoteServiceImplBase {
         private String HostName;
         private Server VoteServer;
-        private ZkServiceImplmentation zkServiceAPI;
+        public static ZkServiceImplmentation zkServiceAPI;
         private String cluster_state_name;
         private Boolean service_start;
         private Boolean service_integrity;
@@ -32,7 +37,6 @@ import java.util.*;
         public VotingServerImpl(String port, String hostList, String state) {
             cluster_state_name = state;
             service_start = false;
-            ClusterData.ZKhost_list = hostList;
             stubs = new ArrayList<VotingServerStubs>();
             votes = new HashMap<>(0);
             int portNum = Integer.parseInt(port);
@@ -69,6 +73,15 @@ import java.util.*;
 
                 zkServiceAPI.registerChildrenChangeWatcher(ClusterData.MEMBERSHIP_APP + "/" + state , new MembershipListener());
                 log.info("add permneant watcher for membership");
+
+                zkServiceAPI.deleteIntegritiy();
+                log.info("Deleted previous untrusted nodes");
+
+                //init Cluster Data
+                ClusterData.getClusterInfo().setZKhost(zkServiceAPI);
+                ClusterData.getClusterInfo().setLeader(zkServiceAPI.getLeaderNodeData(cluster_state_name));
+                ClusterData.getClusterInfo().setLiveNodes(zkServiceAPI.getLiveNodes(cluster_state_name));
+
 
                 log.info("Host startup done" + HostName);
 
@@ -114,6 +127,7 @@ import java.util.*;
         @Override
         public void vote(protos.VotingService.VoteRequest request,
                          io.grpc.stub.StreamObserver<protos.VotingService.VoteRequest> responseObserver) {
+        /** Voting service down at the moment **/
         if(!service_start) {
             VotingService.VoteRequest reply = VotingService.VoteRequest.newBuilder()
                     .setVoteAccepted(false).build();
@@ -122,12 +136,14 @@ import java.util.*;
             log.info("ID {} tried to vote before or after the election started", request.getVoterId());
             return;
         }
+
+        /** This node is the leader **/
         if (isNodeLeader()) {
             int counter = 0;
             Date date = new Date();
             long time = date.getTime();
             Timestamp ts = new Timestamp(time);
-            List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
+            List <String> alive_nodes = ClusterData.getClusterInfo().getLiveNodes();
             alive_nodes.remove(HostName);
             stubs = updateAlive(alive_nodes);
 
@@ -146,6 +162,7 @@ import java.util.*;
                     protos.VotingService.VoteRequest reply = temp.stub.vote(newRequest);
                     if (reply.getVoteAccepted())
                         counter++;
+                    temp.channel.shutdown();
                 }
                 catch (Exception e) {
                    log.info("Leader wasn't able to communicate with all the cluster, rollback will be performed");
@@ -215,12 +232,13 @@ import java.util.*;
                         catch (Exception e) {
                             log.error("Was unable to send ack to leader, rolling back solo");
                             votes.remove(request.getVoterId());
-                            votes.put(info.getVoterID(), info);
+                            if(info != null)
+                                votes.put(info.getVoterID(), info);
                             log.error("Rollback Solo succeeded");
                         }
                 }
             else {
-                String leader = zkServiceAPI.getLeaderNodeData(cluster_state_name);
+                String leader = ClusterData.getClusterInfo().getLeader();
                 String[] parts = leader.split(":");
 
                 log.info("Sent to leader to create total order");
@@ -228,6 +246,7 @@ import java.util.*;
                 try {
                     VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
                     VotingService.VoteRequest respond = leaderStub.stub.vote(request);
+                    leaderStub.channel.shutdown();
                     if(respond.getLeaderDone()) {
                         try {
                             responseObserver.onNext(request);
@@ -236,7 +255,7 @@ import java.util.*;
                         }
                         catch (Exception e) {
                             log.error("REST server wasn't able to accept ack, rolling back vote");
-                            List <String> alive_nodes = zkServiceAPI.getLiveNodes(cluster_state_name);
+                            List <String> alive_nodes = ClusterData.getClusterInfo().getLiveNodes();
                             stubs = updateAlive(alive_nodes);
                             rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
                         }
@@ -260,6 +279,7 @@ import java.util.*;
                                     io.grpc.stub.StreamObserver<protos.VotingService.VoteRequest> responseObserver,
                                     Timestamp ts, boolean sendBack) {
             int counter_delete = 0;
+            updateAlive(ClusterData.getClusterInfo().getLiveNodes());
             VoteInfo info = (votes.get(request.getVoterId()));
             if (info != null) {
                 for (VotingServerStubs temp : stubs) {
@@ -274,10 +294,12 @@ import java.util.*;
                         if (reply.getDeleteSuccess()) {
                             counter_delete++;
                         }
+                        temp.channel.shutdown();
                     }
                     catch (Exception e){
-                        log.error("Could be that server" + temp.Host + Integer.toString(temp.Port) + "data is incossitent");
-                        //TODO kill that server
+                        log.error("Could be that server" + temp.Host + Integer.toString(temp.Port) + "data is incossitent" +
+                                "Creating an integrity node");
+                        zkServiceAPI.createIntegrityNode(temp.Host + ":" + temp.Port);
                     }
                 }
                 log.info("Rollbacked {} servers", counter_delete);
@@ -339,7 +361,7 @@ import java.util.*;
                                io.grpc.stub.StreamObserver<protos.VotingService.StartorStopRequest> responseObserver) {
             log.info("Received a startOrStop call");
             if (request.getFirst()) {
-                List<String> nodes = zkServiceAPI.getLiveNodes(request.getState());
+                List<String> nodes = ClusterData.getClusterInfo().getLiveNodes();
                 nodes.remove(HostName);
                 int startedCounter = 0;
 
@@ -359,6 +381,7 @@ import java.util.*;
                         if (reply.getStartedCounter() == 1) {
                             startedCounter++;
                         }
+                        Stub.channel.shutdown();
 
                     }
                     catch (Exception e) {
@@ -445,6 +468,29 @@ import java.util.*;
             responseObserver.onNext(state_winner);
             responseObserver.onCompleted();
         }
+
+    public static void main(String[] args) {
+        try {
+            BasicConfigurator.configure();
+            Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+            root.setLevel(Level.INFO);
+
+            if(args.length == 3) {
+                VotingServerImpl mainServer = new VotingServerImpl(args[0], args[1], args[2]);
+                ClusterData.getClusterInfo().setZKhost(zkServiceAPI);
+                mainServer.start();
+                log.info("Server started listening on port {} ", args[0]);
+                mainServer.blockUntilShutdown();
+            }
+            else {
+                throw new RuntimeException("Not enough argmuents");
+            }
+        }
+        catch (Exception e){
+            System.out.println("failed to start");
+        }
+
+    }
 
 }
 

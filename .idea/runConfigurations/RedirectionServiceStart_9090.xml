@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="RedirectionServiceStart" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="RedirectionServiceStart 9090" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" singleton="false">
     <module name="DS" />
     <extension name="coverage">
       <pattern>

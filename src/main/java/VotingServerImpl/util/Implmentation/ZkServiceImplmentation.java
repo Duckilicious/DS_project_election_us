@@ -69,6 +69,13 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
         }
     }
 
+    public List<String> getUntrustedNodes() {
+        if(!zkClient.exists(ClusterData.INTEGRITY_APP)) {
+            zkClient.create( ClusterData.INTEGRITY_APP, "Nodes that can't be trusted", CreateMode.PERSISTENT);
+        }
+        return zkClient.getChildren(ClusterData.INTEGRITY_APP);
+    }
+
 
     @Override
     public void createAllParentNodes(String state) {
@@ -84,6 +91,22 @@ public class ZkServiceImplmentation implements ZkServiceAPI {
         if (!zkClient.exists(ClusterData.LEADER_ELECTION +  state)) {
             zkClient.create(ClusterData.LEADER_ELECTION +  state, "election node", CreateMode.PERSISTENT);
         }
+        if(!zkClient.exists(ClusterData.INTEGRITY_APP)){
+            zkClient.create( ClusterData.INTEGRITY_APP, "Nodes that can't be trusted", CreateMode.PERSISTENT);
+        }
+
+    }
+
+    public void deleteIntegritiy() {
+        List<String> to_delete = zkClient.getChildren(ClusterData.INTEGRITY_APP);
+        for(String temp : to_delete) {
+            zkClient.delete(ClusterData.INTEGRITY_APP.concat("/").concat(temp));
+        }
+    }
+
+    public void createIntegrityNode(String nodeName){
+        if(!zkClient.exists(ClusterData.INTEGRITY_APP.concat("/").concat(nodeName)))
+            zkClient.create( ClusterData.INTEGRITY_APP.concat("/").concat(nodeName), "Data can't be blindly trusted", CreateMode.PERSISTENT);
     }
 
 

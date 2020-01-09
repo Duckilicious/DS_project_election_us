@@ -2,6 +2,8 @@ package VotingServerImpl.util;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import VotingServerImpl.util.Implmentation.ZkServiceImplmentation;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,14 +13,16 @@ public class ClusterData {
 
     public static final String LEADER_ELECTION = "/leader_election_app";
     public static final String MEMBERSHIP_APP = "/membership_app";
+    public static final String INTEGRITY_APP = "/integrity_app";
 
-    public static String ZKhost_list;
 
     private static ClusterData clusterdata = new ClusterData();
 
     public static ClusterData getClusterInfo(){
         return clusterdata;
     }
+
+    private ZkServiceImplmentation ZKhost;
 
     //live nodes of the cluster
     private List<String> liveNodes = new ArrayList<>();

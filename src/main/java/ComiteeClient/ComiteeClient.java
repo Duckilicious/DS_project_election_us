@@ -192,6 +192,12 @@ public class ComiteeClient {
 
     public VotingServerStubs getStateStub(String state) {
         List<String> hostNames = zkServiceAPI.getLiveNodes(state);
+        List<String> untrustedNodes = zkServiceAPI.getUntrustedNodes();
+
+        //Remove untrusted nodes
+        for(String temp : untrustedNodes) {
+            hostNames.remove(temp);
+        }
         if(hostNames.size()  == 0){
             throw new RuntimeException();
         }
