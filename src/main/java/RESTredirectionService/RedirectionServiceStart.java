@@ -24,7 +24,7 @@ public class RedirectionServiceStart {
 		}
 		BasicConfigurator.configure();
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-		root.setLevel(Level.INFO);
+		root.setLevel(Level.ERROR);
 		startup(args[0]);
 		SpringApplication.run(RedirectionServiceStart.class, args);
 	}

@@ -1,13 +1,11 @@
 package VotingServerImpl.GrpcServer;
 
-import RESTredirectionService.models.Vote;
 import VotingServerImpl.ZkListeners.MasterChangeListener;
 import VotingServerImpl.ZkListeners.MembershipListener;
 import VotingServerImpl.util.ClusterData;
 import VotingServerImpl.util.HostIP;
 import VotingServerImpl.util.Implmentation.ZkServiceImplmentation;
 import VotingServerImpl.util.VoteInfo;
-import VotingServerImpl.util.ZkServiceAPI;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import io.grpc.Server;
@@ -19,7 +17,10 @@ import protos.VoteServiceGrpc;
 import protos.VotingService;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 //TODO: change from checking zookeeper all the time to checkiong the ClusterInfo struct
 
@@ -116,6 +117,8 @@ import java.util.*;
             //create a list with new members stub
             for (String temp : alive_nodes) {
                 int i = 0;
+                if(temp.equals(HostName))
+                    continue;
                 String[] parts = temp.split(":");
                 VotingServerStubs stub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
                 stubs.add(i, stub);
@@ -129,7 +132,7 @@ import java.util.*;
         /** Voting service down at the moment **/
         if(!service_start) {
             VotingService.VoteRequest reply = VotingService.VoteRequest.newBuilder()
-                    .setVoteAccepted(false).build();
+                    .setVoteAccepted(false).setElectionEnded(true).build();
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
             log.info("ID {} tried to vote before or after the election started", request.getVoterId());
@@ -448,8 +451,10 @@ import java.util.*;
             }
 
             int candidateWithMaxVotes = 0;
+            int maxVotes = 0;
             for (voteCounter temp : voteCounters) {
-                if(temp.getCounter() > candidateWithMaxVotes) {
+                if(temp.getCounter() > maxVotes) {
+                    maxVotes = temp.getCounter();
                     candidateWithMaxVotes = temp.getCandidate();
                 }
             }

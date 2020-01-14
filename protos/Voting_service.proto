@@ -9,6 +9,7 @@ message VoteRequest {
     string accepted_by = 5; //default = false
     bool vote_accepted = 6; //default = false
     bool leader_done = 7; //default = false
+    bool election_ended = 8;
 }
 
 message StartorStopRequest {
