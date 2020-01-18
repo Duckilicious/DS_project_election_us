@@ -138,76 +138,75 @@ import java.util.List;
             log.info("ID {} tried to vote before or after the election started", request.getVoterId());
             return;
         }
+            /** This node is the leader **/
+            if (isNodeLeader()) {
+                int counter = 0;
+                Date date = new Date();
+                long time = date.getTime();
+                Timestamp ts = new Timestamp(time);
+                List<String> alive_nodes = ClusterData.getClusterInfo().getLiveNodes();
+                alive_nodes.remove(HostName);
+                stubs = updateAlive(alive_nodes);
 
-        /** This node is the leader **/
-        if (isNodeLeader()) {
-            int counter = 0;
-            Date date = new Date();
-            long time = date.getTime();
-            Timestamp ts = new Timestamp(time);
-            List <String> alive_nodes = ClusterData.getClusterInfo().getLiveNodes();
-            alive_nodes.remove(HostName);
-            stubs = updateAlive(alive_nodes);
-
-            //Create a new request for all servers with a new time stamp
-            protos.VotingService.VoteRequest newRequest = protos.VotingService.VoteRequest
-                    .newBuilder()
-                    .setLeaderSent(true)
-                    .setTime(ts.toString())
-                    .setVoterId(request.getVoterId())
-                    .setVoterCandidate(request.getVoterCandidate())
-                    .build();
-            //
-            log.info("Leader set time for vote, total order was established");
-            for (VotingServerStubs temp : stubs) {
-                try {
-                    protos.VotingService.VoteRequest reply = temp.stub.vote(newRequest);
-                    if (reply.getVoteAccepted())
-                        counter++;
-                    temp.channel.shutdown();
-                }
-                catch (Exception e) {
-                   log.info("Leader wasn't able to communicate with all the cluster, rollback will be performed");
-                }
-            }
-            //every alive member updated updated
-            if (counter == alive_nodes.size()){
-                log.info("Vote accepted by the entire cluster");
-                votes.put(request.getVoterId(),
-                        new VoteInfo(request.getVoterId(),
-                        ts,
-                        request.getVoterCandidate() ));
-                protos.VotingService.VoteRequest respond = protos.VotingService.VoteRequest
+                //Create a new request for all servers with a new time stamp
+                protos.VotingService.VoteRequest newRequest = protos.VotingService.VoteRequest
                         .newBuilder()
                         .setLeaderSent(true)
                         .setTime(ts.toString())
                         .setVoterId(request.getVoterId())
-                        .setVoteAccepted(true)
-                        .setLeaderDone(true)
-                        .setAcceptedBy("all cluster")
                         .setVoterCandidate(request.getVoterCandidate())
                         .build();
-                try {
-                    responseObserver.onNext(respond);
-                    responseObserver.onCompleted();
-                    log.info("Vote recorded for {}", request.getVoterId());
+                //
+                log.info("Leader set time for vote, total order was established");
+                for (VotingServerStubs temp : stubs) {
+                    try {
+                        protos.VotingService.VoteRequest reply = temp.stub.vote(newRequest);
+                        if (reply.getVoteAccepted())
+                            counter++;
+                        temp.channel.shutdown();
+                    } catch (Exception e) {
+                        log.info("Leader wasn't able to communicate with all the cluster, rollback will be performed");
+                    }
+                }
+                //every alive member updated updated
+                if (counter == alive_nodes.size()) {
+                    log.info("Vote accepted by the entire cluster");
+                    votes.put(request.getVoterId(),
+                            new VoteInfo(request.getVoterId(),
+                                    ts,
+                                    request.getVoterCandidate()));
+                    protos.VotingService.VoteRequest respond = protos.VotingService.VoteRequest
+                            .newBuilder()
+                            .setLeaderSent(true)
+                            .setTime(ts.toString())
+                            .setVoterId(request.getVoterId())
+                            .setVoteAccepted(true)
+                            .setLeaderDone(true)
+                            .setAcceptedBy("all cluster")
+                            .setVoterCandidate(request.getVoterCandidate())
+                            .build();
+                    try {
+                        responseObserver.onNext(respond);
+                        responseObserver.onCompleted();
+                        log.info("Vote recorded for {}", request.getVoterId());
 
+                    } catch (Exception e) {
+                        log.info("Wasn't able to send ack to the requester rolling back vote");
+                        rollbackRequest(request, responseObserver, ts, false);
+                    }
                 }
-                catch(Exception e) {
-                    log.info("Wasn't able to send ack to the requester rolling back vote");
-                    rollbackRequest(request, responseObserver, ts, false);
-                }
-            }
-            //updating failed -- keeping atomicity
-            else {
+
+                //updating failed -- keeping atomicity
+                else {
                     rollbackRequest(request, responseObserver, ts, true);
                 }
-        }
-        //Node isn't leader
-        else {
-            //We got the correct timestamp
-            if (request.getLeaderSent()) {
-                //See if we need to update
+
+            }
+            //Node isn't leader
+            else {
+                //We got the correct timestamp
+                if (request.getLeaderSent()) {
+                    //See if we need to update
                     VoteInfo info = votes.get(request.getVoterId());
                     if (info == null || info.getTime().before(Timestamp.valueOf(request.getTime()))) {
                         votes.remove(request.getVoterId());
@@ -227,53 +226,48 @@ import java.util.List;
                             .setLeaderDone(false)
                             .build();
 
-                        try {
-                            responseObserver.onNext(respond);
-                            responseObserver.onCompleted();
-                        }
-                        catch (Exception e) {
-                            log.error("Was unable to send ack to leader, rolling back solo");
-                            votes.remove(request.getVoterId());
-                            if(info != null)
-                                votes.put(info.getVoterID(), info);
-                            log.error("Rollback Solo succeeded");
-                        }
-                }
-            else {
-                String leader = ClusterData.getClusterInfo().getLeader();
-                String[] parts = leader.split(":");
+                    try {
+                        responseObserver.onNext(respond);
+                        responseObserver.onCompleted();
+                    } catch (Exception e) {
+                        log.error("Was unable to send ack to leader, rolling back solo");
+                        votes.remove(request.getVoterId());
+                        if (info != null)
+                            votes.put(info.getVoterID(), info);
+                        log.error("Rollback Solo succeeded");
+                    }
+                } else {
+                    String leader = ClusterData.getClusterInfo().getLeader();
+                    String[] parts = leader.split(":");
 
-                log.info("Sent to leader to create total order");
+                    log.info("Sent to leader to create total order");
 
-                try {
-                    VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
-                    VotingService.VoteRequest respond = leaderStub.stub.vote(request);
-                    leaderStub.channel.shutdown();
-                    if(respond.getLeaderDone()) {
-                        try {
-                            responseObserver.onNext(respond);
-                            responseObserver.onCompleted();
-                            log.info("Sending back info to REST server");
+                    try {
+                        VotingServerStubs leaderStub = new VotingServerStubs(parts[0], Integer.parseInt(parts[1]));
+                        VotingService.VoteRequest respond = leaderStub.stub.vote(request);
+                        leaderStub.channel.shutdown();
+                        if (respond.getLeaderDone()) {
+                            try {
+                                responseObserver.onNext(respond);
+                                responseObserver.onCompleted();
+                                log.info("Sending back info to REST server");
+                            } catch (Exception e) {
+                                log.error("REST server wasn't able to accept ack, rolling back vote");
+                                List<String> alive_nodes = ClusterData.getClusterInfo().getLiveNodes();
+                                stubs = updateAlive(alive_nodes);
+                                rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
+                            }
                         }
-                        catch (Exception e) {
-                            log.error("REST server wasn't able to accept ack, rolling back vote");
-                            List <String> alive_nodes = ClusterData.getClusterInfo().getLiveNodes();
-                            stubs = updateAlive(alive_nodes);
-                            rollbackRequest(request, responseObserver, Timestamp.valueOf(request.getTime()), false);
-                        }
+                    } catch (Exception e) {
+                        log.error("Leader unavailable failing the vote");
+                        VotingService.VoteRequest respond = VotingService.VoteRequest.newBuilder()
+                                .setVoteAccepted(false)
+                                .build();
+                        responseObserver.onNext(respond);
+                        responseObserver.onCompleted();
                     }
                 }
-                catch (Exception e){
-                    log.error("Leader unavailable failing the vote");
-                    VotingService.VoteRequest respond = VotingService.VoteRequest.newBuilder()
-                            .setVoteAccepted(false)
-                            .build();
-                    responseObserver.onNext(respond);
-                    responseObserver.onCompleted();
-                }
             }
-            }
-
         }
 
 
