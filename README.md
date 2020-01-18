@@ -18,6 +18,6 @@ High consistency – We create a replica of each user vote on each of the state 
 	
 The following is a high level diagram of our system:
 
-![alt text](https://github.com/Duckilicious/DS_project_election_us/blob/master/DS_project_documentation/HighLevel%20design%20DS.jpg)
+![alt text](https://github.com/Duckilicious/DS_project_election_us/blob/master/DS_project_documentation/HighLevenDesign.png)
 
 Further documentation can be found in the repo.
